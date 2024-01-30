@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "declaration": true,
+    "target": "es6",
+    "module": "es6",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "strict": false,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "declarationDir": "./types"
+  },
+  "include": ["./examples/**/*", "./src/**/*", "typings.d.ts"]
+}

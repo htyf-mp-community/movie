@@ -1,0 +1,38 @@
+.pages-setting-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-grow: 2;
+  background: #ededed;
+}
+
+.pages-setting-body-wrap {
+  flex-grow: 2;
+  height: 0;
+  display: flex;
+}
+
+.pages-setting-scroll-view {
+  flex-grow: 2;
+}
+
+.pages-setting-scroll-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.pages-setting-app-data-string-ipt-wrap {
+  height: 80px;
+}
+
+.pages-setting-app-data-string-ipt {
+  height: 80px;
+  padding: 10px 30px;
+  background: #eee;
+}

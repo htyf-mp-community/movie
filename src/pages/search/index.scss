@@ -1,0 +1,124 @@
+.pages-search-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-grow: 2;
+  background-color: #222222;
+}
+
+.pages-search-body-wrap {
+  flex-grow: 2;
+  height: 0;
+  display: flex;
+}
+
+.pages-search-scroll-view {
+  flex-grow: 2;
+}
+
+.pages-search-scroll-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+
+.pages-search-items-wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 60px 40px 0;
+}
+
+.pages-search-item-wrap {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 318px;
+}
+
+.pages-search-item-img-wrap{
+  width: 286px;
+  height: 404px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eee;
+}
+
+.pages-search-item-img {
+  width: 286px;
+  height: 404px;
+  overflow: hidden;
+}
+.pages-search-item-info-wrap {
+  margin-bottom: 20px;
+}
+
+.pages-search-item-name-wrap {
+  width: 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-search-item-name {
+  color: #ccc;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.pages-search-item-sub-wrap {
+  width: 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-search-item-sub {
+  color: #999;
+  font-size: 26px;
+}
+
+.pages-search-search-wrap {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 2px solid #999;
+}
+
+.pages-search-ipt-wrap {
+  overflow: hidden;
+  flex-grow: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.pages-search-ipt {
+  flex-grow: 2;
+  height: 80px;
+  padding: 0 30px;
+  background-color: #eee;
+}
+
+.pages-search-ipt-btn {
+  width: 100px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0ff;
+}
+
+.pages-search-ipt-btn-text {
+  font-size: 28px;
+  color: #333;
+}

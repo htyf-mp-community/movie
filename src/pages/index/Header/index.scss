@@ -1,0 +1,118 @@
+.pages-index-header-wrap {
+  background: #1b1b1b;
+  display: flex;
+  flex-direction: column;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: #eee;
+  flex-shrink: 0;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+}
+
+.pages-index-header-body {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 80px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pages-index-header-body-left {
+  flex-shrink: 0;
+  min-width: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.pages-index-header-body-right {
+  flex-shrink: 0;
+  min-width: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.pages-index-header-body-center {
+  width: 0;
+  flex-grow: 2;
+  display: flex;
+  overflow: hidden;
+}
+
+.pages-index-header-left-back-btn {
+  margin-left: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-index-header-left-back-icon-white-wrap {
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-index-header-left-back-icon-white {
+  width: 36px;
+  height: 36px;
+}
+
+.pages-index-header-left-back-icon-black {
+  width: 56px;
+  height: 56px;
+}
+
+.pages-index-header-body-center-title {
+  font-size: 36px;
+  font-weight: 500;
+  color: #192038;
+  line-height: 52px;
+  /* postcss-pxtransform rn eject enable */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* postcss-pxtransform rn eject disable */
+}
+
+.pages-index-header-search-wrap {
+  height: 40px;
+  background: #c0c0c0;
+  flex-grow: 2;
+  margin: 14px 100px 20px 20px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.pages-index-header-search-text {
+  font-size: 28px;
+  color: #333;
+}
+
+.pages-index-header-search-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+}

@@ -1,0 +1,7 @@
+example/
+src/
+
+./script.js
+rollup.config.js
+
+!dist/

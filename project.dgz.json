@@ -1,0 +1,8 @@
+{
+  "type": "app",
+  "name": "电影基地",
+  "projectname": "电影基地",
+  "appid": "movie_996",
+  "appUrlConfig": "https://xxx/latest/outputs/app.json",
+  "zipUrl": "https://xxx/latest/outputs/dist.zip"
+}

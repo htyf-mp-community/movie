@@ -1,0 +1,155 @@
+.pages-type-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-grow: 2;
+  background-color: #222222;
+}
+
+.pages-type-body-wrap {
+  flex-grow: 2;
+  height: 0;
+  display: flex;
+}
+
+.pages-type-scroll-view {
+  flex-grow: 2;
+}
+
+.pages-type-scroll-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+
+.pages-type-items-wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 60px 40px 0;
+}
+
+.pages-type-item-wrap {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 318px;
+}
+
+.pages-type-item-img-wrap{
+  width: 286px;
+  height: 404px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eee;
+}
+
+.pages-type-item-img {
+  width: 286px;
+  height: 404px;
+  overflow: hidden;
+}
+.pages-type-item-info-wrap {
+  margin-bottom: 20px;
+}
+
+.pages-type-item-name-wrap {
+  width: 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-type-item-name {
+  color: #ccc;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.pages-type-item-sub-wrap {
+  width: 286px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-type-item-sub {
+  color: #999;
+  font-size: 26px;
+}
+
+.pages-type-search-wrap {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 2px solid #999;
+}
+
+.pages-type-ipt-wrap {
+  overflow: hidden;
+  flex-grow: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.pages-type-ipt {
+  flex-grow: 2;
+  height: 80px;
+  padding: 0 30px;
+  background-color: #eee;
+}
+
+.pages-type-ipt-btn {
+  width: 100px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0ff;
+}
+
+.pages-type-ipt-btn-text {
+  font-size: 28px;
+  color: #333;
+}
+
+.pages-type-select-wrap {
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pages-type-select-item-btn {
+  padding: 10px 16px;
+  background-color: #eee;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pages-type-select-item-text {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.pages-type-select-item-btn-on{
+  background-color: red;
+}
+
+.pages-type-select-item-text-on {
+  color: #fff;
+}
