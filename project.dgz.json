@@ -3,6 +3,6 @@
   "name": "电影基地",
   "projectname": "电影基地",
   "appid": "movie_996",
-  "appUrlConfig": "https://hub.gitmirror.com/https://github.com/htyf-mp-community/movie/releases/latest/download/app.json",
-  "zipUrl": "https://hub.gitmirror.com/https://github.com/htyf-mp-community/movie/releases/latest/download/dist.zip"
-} 
+  "appUrlConfig": "https://github.abskoop.workers.dev/https://github.com/htyf-mp-community/movie/releases/latest/download/app.json",
+  "zipUrl": "https://github.abskoop.workers.dev/https://github.com/htyf-mp-community/movie/releases/latest/download/dist.zip"
+}
