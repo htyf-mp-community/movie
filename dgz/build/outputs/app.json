@@ -2,7 +2,7 @@
   "type": "app",
   "name": "电影基地",
   "appid": "movie_996",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "appUrlConfig": "https://fastly.jsdelivr.net/gh/htyf-mp-community/movie@main/dgz/build/outputs/app.json",
   "zipUrl": "https://fastly.jsdelivr.net/gh/htyf-mp-community/movie@main/dgz/build/outputs/dist.zip"
 }
