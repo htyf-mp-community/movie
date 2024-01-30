@@ -1,4 +1,4 @@
-## [官网 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
+## [app下载 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
 
 ## 开发步骤
 
@@ -88,3 +88,5 @@ npm run build:dgz
 ```
 
 并将以上 json 生成二维码就可以用红糖云服 app 扫码加入小程序
+
+![小程序码](./public/qrcode.png)
