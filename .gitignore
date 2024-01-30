@@ -8,12 +8,12 @@ node_modules/
 rn-src
 src-rn
 
-# 只保留app.json/dist.zip
+# 只保留app.json/dist.dgz
 dgz/*
 !dgz/build
 dgz/build/*
 !dgz/build/outputs
 dgz/build/outputs/*
 !dgz/build/outputs/app.json
-!dgz/build/outputs/dist.zip
-# 只保留app.json/dist.zip
+!dgz/build/outputs/dist.dgz
+# 只保留app.json/dist.dgz
