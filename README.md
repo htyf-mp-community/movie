@@ -83,7 +83,7 @@ npm run build:dgz
   "appid": "xxxxx",
   "version": "1.0.5",
   "appUrlConfig": "https://xxxx.cos.ap-chengdu.myqcloud.com/assets/testMiniApps/htyanimation/app.json",
-  "zipUrl": "https://xxxxx.myqcloud.com/assets/testMiniApps/xxxxx/outputs/ios/remotes/data.zip"
+  "zipUrl": "https://xxxxx.myqcloud.com/assets/testMiniApps/xxxxx/outputs/ios/remotes/data.dgz"
 }
 ```
 
