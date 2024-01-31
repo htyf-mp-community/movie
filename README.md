@@ -1,4 +1,4 @@
-## [app下载 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
+## [红糖云服app下载 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
 
 ### 使用红糖云服app 扫码添加小程序
 
