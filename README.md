@@ -1,5 +1,16 @@
 ## [app下载 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
 
+### 使用红糖云服app 扫码添加小程序
+
+![小程序码](./public/qrcode.png)
+
+## 预览
+
+| 首页  | 搜索 | 详情 | 播放 |
+| ------------- | ------------- | ------------- | ------------- |
+| ![小程序码](./public/IMG_5063.PNG)  | ![小程序码](./public/IMG_5064.PNG) | ![小程序码](./public/IMG_5065.PNG)  | ![小程序码](./public/IMG_5066.PNG)  |
+
+
 ## 开发步骤
 
 ### 1. 安装依赖,时入项目根目录
@@ -89,4 +100,3 @@ npm run build:dgz
 
 并将以上 json 生成二维码就可以用红糖云服 app 扫码加入小程序
 
-![小程序码](./public/qrcode.png)
