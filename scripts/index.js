@@ -3,8 +3,8 @@ const path = require('path');
 const QRCode = require('qrcode');
 const pkg = require('../package.json')
 const appConfig = require('../project.dgz.json')
-
-QRCode.toFile(path.join(__dirname, '../public/qrcode.png'), JSON.stringify(appConfig), {
+const url = `https://share.dagouzhi.com/#/pages/index/index?data=${encodeURIComponent(JSON.stringify(appConfig))}`
+QRCode.toFile(path.join(__dirname, '../public/qrcode.png'), url, {
     margin: 1,
     width: 256,
     color: {
