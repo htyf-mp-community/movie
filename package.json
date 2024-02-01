@@ -8,9 +8,6 @@
     "typescript": true,
     "css": "sass"
   },
-  "pre-commit": [
-    "build:dgz"
-  ],
   "scripts": {
     "lint": "npm run lint:scss",
     "lint:scss": "stylelint ./src/stylelint.test.scss",
