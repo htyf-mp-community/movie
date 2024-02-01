@@ -4,6 +4,8 @@
 
 ![小程序码](./public/qrcode.png)
 
+>更多小程序demo 请查看[https://github.com/htyf-mp-community/demo](https://github.com/htyf-mp-community/demo)
+
 ## 预览
 
 | 首页  | 搜索 | 详情 | 播放 |
