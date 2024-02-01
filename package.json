@@ -8,6 +8,9 @@
     "typescript": true,
     "css": "sass"
   },
+  "pre-commit": [
+    "build:dgz"
+  ],
   "scripts": {
     "lint": "npm run lint:scss",
     "lint:scss": "stylelint ./src/stylelint.test.scss",
@@ -648,7 +651,6 @@
     "eslint-plugin-react-hooks": "4.2.0",
     "patch-package": "8.0.0",
     "postcss": "8.4.31",
-    "pre-commit": "^1.2.2",
     "react-refresh": "0.14.0",
     "rimraf": "5.0.1",
     "stylelint": "15.11.0",
