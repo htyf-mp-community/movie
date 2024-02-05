@@ -2,7 +2,7 @@
 
 ### 使用红糖云服app 扫码添加小程序
 
-[![小程序码](./public/qrcode.png)](https://share.dagouzhi.com/#/pages/index/index?data=%7B%22type%22%3A%22app%22%2C%22name%22%3A%22%E7%94%B5%E5%BD%B1%E5%9F%BA%E5%9C%B0%22%2C%22projectname%22%3A%22%E7%94%B5%E5%BD%B1%E5%9F%BA%E5%9C%B0%22%2C%22appid%22%3A%22movie_996%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.gitmirror.com%2Fhtyf-mp-community%2Fmovie%2Fmain%2Fdgz%2Fbuild%2Foutputs%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.gitmirror.com%2Fhtyf-mp-community%2Fmovie%2Fmain%2Fdgz%2Fbuild%2Foutputs%2Fdist.dgz%22%7D)
+[![小程序码](./qrcode.png)](https://share.dagouzhi.com/#/pages/index/index?data=%7B%22type%22%3A%22app%22%2C%22name%22%3A%22%E7%94%B5%E5%BD%B1%E5%9F%BA%E5%9C%B0%22%2C%22projectname%22%3A%22%E7%94%B5%E5%BD%B1%E5%9F%BA%E5%9C%B0%22%2C%22appid%22%3A%22movie_996%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.gitmirror.com%2Fhtyf-mp-community%2Fmovie%2Fmain%2Fdgz%2Fbuild%2Foutputs%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.gitmirror.com%2Fhtyf-mp-community%2Fmovie%2Fmain%2Fdgz%2Fbuild%2Foutputs%2Fdist.dgz%22%7D)
 
 >更多小程序demo 请查看[https://github.com/htyf-mp-community/demo](https://github.com/htyf-mp-community/demo)
 
@@ -49,33 +49,10 @@ export default definePageConfig({
 })
 
 ```
-> 11. 页面头部组件使用自定义`import { Header } from '@/_UIHOOKS_';`
+> 11. 页面头部组件使用自定义`import { Header } from '@/UIHooks';`
 > 12. 页面如需要滚动使用`import { ScrollView } from '@tarojs/components'';`
-> 13. 每个页面都规则模板(必须引入`<UIProvider>`)
-```
-import {View } from '@tarojs/components'
-import { Header, UIProvider } from '@/_UIHOOKS_';
 
-function Index() {
-  return (
-    <View>
-      
-    </View>
-  )
-}
-export default () => <UIProvider><Index /></UIProvider>
-```
-> 14. `_UIHOOKS_`目录里的样式名规范： `uihooks-相对路径-具体类名`
-
-### 3. 目录
-
-```
-@/_UIHOOKS_ // 公共组件/公共方法
-@/_UIHOOKS_/store       // reudx store
-@/assets      // 全局资源 
-```
-
-### 4. 打包
+### 3. 打包
 
 > 打包其它小程序按 taro 官方文档打包
 
@@ -83,7 +60,15 @@ export default () => <UIProvider><Index /></UIProvider>
 
 ```
 npm run build:dgz
+dgz 小程序!!!
+? [小程序]请选择你想要操作的任务？
+  1) 初始化
+  2) 打包
+  3) 补丁
+  4) 退出
 ```
+
+选择[2]打包
 
 ### 4. 上传运行红糖云服小程序
 
@@ -92,23 +77,15 @@ npm run build:dgz
 ```
 {
   "type": "app",
-  "name": "xxxx",
-  "appid": "xxxxx",
-  "version": "1.0.5",
-  "appUrlConfig": "https://xxxx.cos.ap-chengdu.myqcloud.com/assets/testMiniApps/htyanimation/app.json",
-  "zipUrl": "https://xxxxx.myqcloud.com/assets/testMiniApps/xxxxx/outputs/ios/remotes/data.dgz"
+  "name": "RN模版",
+  "projectname": "RN模版",
+  "appid": "__rn_temp_appid__",
+  "appUrlConfig": "https://raw.gitmirror.com/htyf-mp-community/htyf-mp/main/mini-apps-template-rn/dgz/build/outputs/app.json",
+  "zipUrl": "https://raw.gitmirror.com/htyf-mp-community/htyf-mp/main/mini-apps-template-rn/dgz/build/outputs/dist.dgz"
 }
 ```
 
 并将以上 json 生成二维码就可以用红糖云服 app 扫码加入小程序
-
-## 免责
-
-1. 本项目所有数据信息均来自站长资源网站，本软件相当于浏览器，用户只是从网页中获取数据
-
-2. 本项目承诺不保存任何第三方用户信息
-
-3. 本项目代码仅供学习交流，不得用于商业用途，若侵权请联系
 
 ## 投食
 
@@ -116,4 +93,4 @@ npm run build:dgz
 
 | 微信  | 支付宝 |
 | ------------- | ------------- |
-| ![小程序码](./public/IMG_5087.jpg)  | ![小程序码](./public/IMG_5088.jpg) |
+| ![微信](./docs/IMG_5087.jpg)  | ![支付宝](./docs/IMG_5088.jpg) |

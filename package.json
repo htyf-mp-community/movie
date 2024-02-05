@@ -15,7 +15,7 @@
     "postinstall": "npm run dgz:init && cd packages/js-crawler && yarn && npm run build",
     "dgz": "node ./scripts/index.js && mini-apps-cli",
     "build:js-crawler": "cd packages/js-crawler && npm run build",
-    "dgz:init": "mini-apps-cli --init",
+    "dgz:init": "node ./scripts/index.js && mini-apps-cli --init",
     "build:dgz": "node ./scripts/index.js && mini-apps-cli --build",
     "build:weapp": "taro build --type weapp",
     "build:swan": "taro build --type swan",
