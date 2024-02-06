@@ -25,6 +25,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["./types", "src", "src/_UIHOOKS_/components/WebviewRequest/vconsole.min.js"],
+  "include": ["./types", "src"],
   "compileOnSave": false
 }

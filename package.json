@@ -1,6 +1,6 @@
 {
   "name": "mini-apps-template",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "description": "mini-apps-template",
   "templateInfo": {
@@ -9,14 +9,15 @@
     "css": "sass"
   },
   "scripts": {
+    "run:scripts": "node ./scripts/index.js",
     "lint": "npm run lint:scss",
     "lint:scss": "stylelint ./src/stylelint.test.scss",
     "start": "react-native webpack-start -- --reset-cache",
     "postinstall": "npm run dgz:init && cd packages/js-crawler && yarn && npm run build",
-    "dgz": "node ./scripts/index.js && mini-apps-cli",
+    "dgz": "npm run run:scripts && mini-apps-cli",
     "build:js-crawler": "cd packages/js-crawler && npm run build",
-    "dgz:init": "node ./scripts/index.js && mini-apps-cli --init",
-    "build:dgz": "node ./scripts/index.js && mini-apps-cli --build",
+    "dgz:init": "npm run run:scripts && mini-apps-cli --init",
+    "build:dgz": "npm run run:scripts && mini-apps-cli --build",
     "build:weapp": "taro build --type weapp",
     "build:swan": "taro build --type swan",
     "build:alipay": "taro build --type alipay",
@@ -351,7 +352,7 @@
     "@dr.pogodin/react-native-fs": "2.21.0-alpha.8",
     "@dr.pogodin/react-native-static-server": "0.10.4",
     "@gorhom/bottom-sheet": "4.6.0",
-    "@hongtangyun/react-native-mini-apps-engines": "^0.15.7",
+    "@hongtangyun/react-native-mini-apps-engines": "^0.15.11",
     "@hongtangyun/react-native-utils": "0.1.2",
     "@hongtangyun/rooms-sdk": "0.10.20",
     "@hromovp/react-native-static-server": "0.5.5",
