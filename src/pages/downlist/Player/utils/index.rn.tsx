@@ -1,4 +1,3 @@
-import { useMiniAppSdk } from '@hongtangyun/react-native-mini-apps-engines';
 import delay from 'delay';
 import { Ref, forwardRef, useEffect, useImperativeHandle } from 'react';
 
@@ -25,11 +24,11 @@ export interface PlayRef {
 }
 
 const Play = forwardRef((props, ref: Ref<PlayRef | undefined>) => {
-  const sdk = useMiniAppSdk();
+  const sdk = global['__GLOBAL_MINI_APP_SDK__'];
 
   useImperativeHandle(ref, () => ({
     play: async (data: PlayItem) => {
-      sdk.openVideoPlayer({
+      sdk?.openVideoPlayer({
         playList: {
           items: [
             {
