@@ -1,6 +1,6 @@
 import delay from 'delay';
 import { Ref, forwardRef, useEffect, useImperativeHandle } from 'react';
-
+import jssdk from '@htyf-mp/js-sdk'
 
 export interface PlayItem {
   url: string;
@@ -24,11 +24,10 @@ export interface PlayRef {
 }
 
 const Play = forwardRef((props, ref: Ref<PlayRef | undefined>) => {
-  const sdk = global['__GLOBAL_MINI_APP_SDK__'];
 
   useImperativeHandle(ref, () => ({
     play: async (data: PlayItem) => {
-      sdk?.openVideoPlayer({
+      jssdk?.openVideoPlayer({
         playList: {
           items: [
             {
@@ -47,7 +46,7 @@ const Play = forwardRef((props, ref: Ref<PlayRef | undefined>) => {
       });
     },
     close: async () => {
-      sdk.closeVideoPlayer()
+      jssdk.closeVideoPlayer()
     }
   }))
 

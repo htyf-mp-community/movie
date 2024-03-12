@@ -8,6 +8,7 @@ import lodash from 'lodash';
 import { useImmer } from 'use-immer';
 import jsCrawler, {host} from '@/utils/js-crawler';
 import Item from '@/component/Item';
+import jssdk from '@htyf-mp/js-sdk'
 
 function Index() {
   const ui = useUI();
@@ -21,18 +22,19 @@ function Index() {
   const [loading, setLoading] = useState(false)
   const getData = useCallback(async (searchword: string = '梦', page: number = 1) => {
     return new Promise(async (resolve) => {
-      if (global['__GLOBAL_MINI_APP_SDK__']) {
+      if (jssdk) {
         const url = `${host}xssearrbch?q=${searchword}&f=_all&p=${page}`
         setLoading(true)
         ui.showToast({
           content: '加载数据中...'
         })
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: url,
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {}
         })
         resolve(data)
         if (data?.items?.length) {

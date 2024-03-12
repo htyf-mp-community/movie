@@ -8,6 +8,7 @@ import Player, { PlayRef } from './utils'
 import URLParse from 'url-parse';
 import jsCrawler, { host } from '@/utils/js-crawler';
 import delay from 'delay';
+import jssdk from '@htyf-mp/js-sdk'
 
 function Index(props: {url: string, bookUrl: string}) {
   const ui = useUI();
@@ -37,18 +38,19 @@ function Index(props: {url: string, bookUrl: string}) {
         resolve('')
         return;
       }
-      if (global['__GLOBAL_MINI_APP_SDK__']) { 
+      if (jssdk) { 
         ui.showToast({
           content: '加载视频信息中...'
         })
         setLoading(true)
         const urlObj = new URLParse(url, true);
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: urlObj.set('origin', host?.replace(/\/$/gi, '')).toString(),
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {}
         })
         const item = {
           time: Date.now(),
@@ -158,10 +160,10 @@ function Index(props: {url: string, bookUrl: string}) {
         resolve('')
         return;
       }
-      if (global['__GLOBAL_MINI_APP_SDK__']) {
+      if (jssdk) {
         setLoading(true)
         const htmlEncodeString = encodeURIComponent(`${html}`)
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: `${url}`,
           jscode: `function(callback) {
             try {
@@ -182,6 +184,7 @@ function Index(props: {url: string, bookUrl: string}) {
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {}
         })
         resolve({
           source: data?.url,

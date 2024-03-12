@@ -8,6 +8,7 @@ import Header from './Header';
 import URLParse from 'url-parse';
 import lodash from 'lodash';
 import Item from '@/component/Item';
+import jssdk from '@htyf-mp/js-sdk'
 
 console.log(jsCrawler)
 
@@ -20,17 +21,18 @@ function Index() {
   const [loading, setLoading] = useState(false)
   const getData = useCallback(async () => {
     return new Promise(async (resolve) => {
-      if (global['__GLOBAL_MINI_APP_SDK__']) {
+      if (jssdk) {
         ui.showToast({
           content: '加载数据中...'
         })
         setLoading(true)
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: `${host}`,
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {}
         })
         resolve(data)
         if (data?.items?.length) {

@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import Player from './Player'
 import delay from 'delay';
 import Item from '@/component/Item';
+import jssdk from '@htyf-mp/js-sdk'
 
 function Index() {
   const ui = useUI();
@@ -37,18 +38,19 @@ function Index() {
       if (!url) {
         return;
       }
-      if (global['__GLOBAL_MINI_APP_SDK__']) {
+      if (jssdk) {
         ui.showToast({
           content: '加载数据中...'
         })
         setLoading(true)
         const urlObj = new URLParse(url, true);
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: urlObj.set('origin', host?.replace(/\/$/gi, '')).toString(),
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {},
         })
         resolve(data)
         console.error(data)

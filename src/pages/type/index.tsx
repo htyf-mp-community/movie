@@ -9,6 +9,7 @@ import { useImmer } from 'use-immer';
 import jsCrawler, {host} from '@/utils/js-crawler';
 import Header from './Header';
 import Item from '@/component/Item'
+import jssdk from '@htyf-mp/js-sdk'
 
 enum TypeEnum {
   'movie_bt' = '全部', 
@@ -63,17 +64,18 @@ function Index() {
       if (type === 'fanju') {
         url = page <= 1 ? `${host}fanju` : `${host}fanju/page/${page}`
       }
-      if (global['__GLOBAL_MINI_APP_SDK__']) {
+      if (jssdk) {
         setLoading(true)
         ui.showToast({
           content: '加载数据中...'
         })
-        const data = await global['__GLOBAL_MINI_APP_SDK__']?.puppeteer({
+        const data = await jssdk?.puppeteer({
           url: url,
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
           timeout: 1000 * 30,
+          callback: () => {}
         })
         resolve(data)
         if (data?.items?.length) {
