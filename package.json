@@ -1,6 +1,6 @@
 {
   "name": "mini-apps-template",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "private": true,
   "description": "mini-apps-template",
   "templateInfo": {
@@ -379,8 +379,8 @@
     "@hongtangyun/react-native-utils": "0.1.2",
     "@hongtangyun/rooms-sdk": "0.10.20",
     "@hromovp/react-native-static-server": "0.5.5",
-    "@htyf-mp/engines": "0.0.10",
-    "@htyf-mp/js-sdk": "0.0.10",
+    "@htyf-mp/engines": "^0.0.11",
+    "@htyf-mp/js-sdk": "^0.0.10",
     "@miblanchard/react-native-slider": "2.6.0",
     "@native-base/icons": "0.0.11",
     "@notifee/react-native": "7.8.2",
@@ -510,6 +510,7 @@
     "expo-modules-core": "1.11.12",
     "expo-notifications": "0.27.6",
     "expo-permissions": "14.4.0",
+    "expo-random": "13.6.0",
     "expo-sensors": "12.9.1",
     "expo-speech": "11.7.0",
     "expo-sqlite": "13.2.2",
@@ -537,6 +538,7 @@
     "metro-react-native-babel-preset": "0.77.0",
     "mobx": "6.12.3",
     "mobx-react-lite": "4.0.7",
+    "nanoid": "3.3.6",
     "native-base": "3.4.28",
     "pako": "2.1.0",
     "patch-package": "8.0.0",
@@ -676,9 +678,7 @@
     "webpack-obfuscator": "3.5.1",
     "webpack-sources": "3.2.3",
     "wtils": "0.2.0",
-    "zustand": "4.5.2",
-    "expo-random": "13.6.0",
-    "nanoid": "3.3.6"
+    "zustand": "4.5.2"
   },
   "devDependencies": {
     "@babel/core": "7.22.19",

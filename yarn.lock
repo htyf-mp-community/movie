@@ -2641,10 +2641,10 @@
   resolved "https://registry.yarnpkg.com/@hromovp/react-native-static-server/-/react-native-static-server-0.5.5.tgz#c8ae66e4b6a5729a34de97bd17c216b81018842b"
   integrity sha512-0edx/cwOU9+Nd7Owz+qjfV/L7ImFneHw7DiBdYBL39Ffxkcij1qnwRyLm4AdqL+/xV+25AUfAlz9t4y/u+N9Zw==
 
-"@htyf-mp/engines@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.10.tgz#25ce960bc801bb164b2ad9a374f71935ab1ca88b"
-  integrity sha512-sWmzrHmYGAtfBpEAbIHM+EsQ4T+btLlBJItVZdUU/beK47XFcTQzTydrgxiGVhXfRGKR+cFC1GC4lPxevuxe/w==
+"@htyf-mp/engines@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.11.tgz#a0dfb65fa461c90839ccebd35068693cba3fe8be"
+  integrity sha512-mkQ9daF106Ss9bqqe0MAZ5XUrJLGdPDdF3Fi353eHeTEfDbuZNg6sJvrWCtp2F9F5pkQOIS+6TSG/M1UI24VJA==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -2678,7 +2678,7 @@
     webpack-cli "^5.1.4"
     yarn-add-no-save "^1.0.3"
 
-"@htyf-mp/js-sdk@0.0.10":
+"@htyf-mp/js-sdk@^0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@htyf-mp/js-sdk/-/js-sdk-0.0.10.tgz#514d34f3f3cfbbbb15d00e5a1bf327a08e97b43c"
   integrity sha512-BISjgNIUv65dwcPaQ2ONp0nbV9BjluyGfIY3meugvDlCFLg7HIusXfqhEbNdiDQ6vhb5CgHbkL1SgigpbE0ztw==
