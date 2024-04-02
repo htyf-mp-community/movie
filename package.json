@@ -1,6 +1,6 @@
 {
   "name": "mini-apps-template",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": true,
   "description": "mini-apps-template",
   "templateInfo": {
@@ -9,7 +9,7 @@
     "css": "sass"
   },
   "scripts": {
-    "run:scripts": "node ./scripts/index.js",
+    "run:scripts": "node ./scripts/index.js && npm run build:js-crawler",
     "lint": "npm run lint:scss",
     "lint:scss": "stylelint ./src/stylelint.test.scss",
     "start": "react-native webpack-start -- --reset-cache",

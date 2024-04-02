@@ -36,6 +36,7 @@ function Index() {
           timeout: 1000 * 30,
           callback: () => {}
         })
+        console.error(data)
         resolve(data)
         if (data?.items?.length) {
           dispatch(setDBData(data?.items))
