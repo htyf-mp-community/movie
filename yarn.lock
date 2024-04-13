@@ -2665,10 +2665,10 @@
   resolved "https://registry.yarnpkg.com/@hromovp/react-native-static-server/-/react-native-static-server-0.5.5.tgz#c8ae66e4b6a5729a34de97bd17c216b81018842b"
   integrity sha512-0edx/cwOU9+Nd7Owz+qjfV/L7ImFneHw7DiBdYBL39Ffxkcij1qnwRyLm4AdqL+/xV+25AUfAlz9t4y/u+N9Zw==
 
-"@htyf-mp/engines@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.32.tgz#70cf1e7adc0165410979d0cb005c3330a2354c96"
-  integrity sha512-kEycY01ZGYNonfHGJgmLyR28mFPAZPdkYalf7st0l63c+rqf0rs5F6OxqH4pqJlM7LiG2TCW3QPGp7lNmLyesg==
+"@htyf-mp/engines@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.33.tgz#2fd80b607eb11bb8521dc3928277b3e798149adf"
+  integrity sha512-LQyi4YYQ6QXQGpizIRq9mGON865tQPRtCIaPQuOob8fQtrmLxxwpUwzVB7l4L6FNQrAWwhZetwZASmx0QUcncA==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
