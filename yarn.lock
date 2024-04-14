@@ -2665,10 +2665,10 @@
   resolved "https://registry.yarnpkg.com/@hromovp/react-native-static-server/-/react-native-static-server-0.5.5.tgz#c8ae66e4b6a5729a34de97bd17c216b81018842b"
   integrity sha512-0edx/cwOU9+Nd7Owz+qjfV/L7ImFneHw7DiBdYBL39Ffxkcij1qnwRyLm4AdqL+/xV+25AUfAlz9t4y/u+N9Zw==
 
-"@htyf-mp/engines@^0.0.33":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.33.tgz#2fd80b607eb11bb8521dc3928277b3e798149adf"
-  integrity sha512-LQyi4YYQ6QXQGpizIRq9mGON865tQPRtCIaPQuOob8fQtrmLxxwpUwzVB7l4L6FNQrAWwhZetwZASmx0QUcncA==
+"@htyf-mp/engines@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.38.tgz#09d34663c976f670a12584be0f110058d0ce009f"
+  integrity sha512-vsF+9dU0+2hj8vx7o9LFuEHVDGZAfvuMkGTIdhTEX6AXb34CdsI5Bh7VMxxRtOCnUls9DdBqtHLX9ufO/mx4Iw==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -2700,6 +2700,7 @@
     uuid "9.0.1"
     webpack "^5.90.1"
     webpack-cli "^5.1.4"
+    webpack-merge "^5.10.0"
     yarn-add-no-save "^1.0.3"
 
 "@htyf-mp/js-sdk@^0.0.10":
@@ -25426,7 +25427,7 @@ webpack-merge@^4.2.2:
   dependencies:
     lodash "^4.17.15"
 
-webpack-merge@^5.7.3:
+webpack-merge@^5.10.0, webpack-merge@^5.7.3:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-5.10.0.tgz#a3ad5d773241e9c682803abf628d4cd62b8a4177"
   integrity sha512-+4zXKdx7UnO+1jaN4l2lHVD+mFvnlZQP/6ljaJVb4SZiwIKeUnrT5l0gkT8z+n4hKpC+jpOv6O9R+gLtag7pSA==

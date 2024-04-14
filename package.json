@@ -17,7 +17,7 @@
     "dgz": "npm run run:scripts && htyf-mp",
     "build:js-crawler": "cd packages/js-crawler && npm run build",
     "dgz:init": "npm run run:scripts && htyf-mp --init",
-    "dev:dgz": "htyf-mp --start",
+    "dev:dgz": "npm run build:dgz && htyf-mp --start",
     "build:dgz": "npm run run:scripts && htyf-mp --build",
     "build:weapp": "taro build --type weapp",
     "build:swan": "taro build --type swan",
