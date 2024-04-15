@@ -2665,10 +2665,10 @@
   resolved "https://registry.yarnpkg.com/@hromovp/react-native-static-server/-/react-native-static-server-0.5.5.tgz#c8ae66e4b6a5729a34de97bd17c216b81018842b"
   integrity sha512-0edx/cwOU9+Nd7Owz+qjfV/L7ImFneHw7DiBdYBL39Ffxkcij1qnwRyLm4AdqL+/xV+25AUfAlz9t4y/u+N9Zw==
 
-"@htyf-mp/engines@^0.0.38":
-  version "0.0.38"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.38.tgz#09d34663c976f670a12584be0f110058d0ce009f"
-  integrity sha512-vsF+9dU0+2hj8vx7o9LFuEHVDGZAfvuMkGTIdhTEX6AXb34CdsI5Bh7VMxxRtOCnUls9DdBqtHLX9ufO/mx4Iw==
+"@htyf-mp/engines@^0.0.42":
+  version "0.0.42"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.0.42.tgz#15549fa8024948fc9355ae3ac7b6e1c9c3f73288"
+  integrity sha512-x/z2R3/NrvnBfnL6lEeN8+GEtcSyRKFA4PNfQupgH2yn0tYcXwbT+qfzaVlx59eMrCaLEk+Ui2GSma2qG3WXwA==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -2684,6 +2684,7 @@
     eventemitter2 "^6.4.9"
     fs-extra "^11.2.0"
     inquirer "8.2.0"
+    jsonc-parser "^3.2.1"
     lodash "^4.17.21"
     md5 "2.3.0"
     ora "5.4.1"
@@ -16094,6 +16095,11 @@ json5@^2.1.1, json5@^2.1.2, json5@^2.2.0, json5@^2.2.2, json5@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
+
+jsonc-parser@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/jsonc-parser/-/jsonc-parser-3.2.1.tgz#031904571ccf929d7670ee8c547545081cb37f1a"
+  integrity sha512-AilxAyFOAcK5wA1+LeaySVBrHsGQvUFCDWXKpZjzaL0PqW+xfBOttn8GNtWKFWqneyMZj41MWF9Kl6iPWLwgOA==
 
 jsonfile@^6.0.1:
   version "6.1.0"
