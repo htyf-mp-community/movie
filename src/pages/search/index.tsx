@@ -23,7 +23,7 @@ function Index() {
   const getData = useCallback(async (searchword: string = '梦', page: number = 1) => {
     return new Promise(async (resolve) => {
       if (jssdk) {
-        const url = `${host}xsssbeanmch?q=${searchword}&f=_all&p=${page}`
+        const url = `${host}daoyongjiekoshibushiyoubing?q=${searchword}&f=_all&p=${page}`
         setLoading(true)
         ui.showToast({
           content: '加载数据中...'

@@ -30,7 +30,7 @@ class SDK extends EventEmitter {
       return this.getDetail();
     } else if (/^\/v_play\/.*\.html$/gi.test(pathname)) {
       return this.getPlayUrl();
-    } else if (/^\/xsssbeanmch/gi.test(pathname)) {
+    } else if (/^\/daoyongjiekoshibushiyoubing/gi.test(pathname)) {
       return this.getSearch();
     } else if (/^\/(movie_bt|dbtop250|zuixindianying|dongmanjuchangban|benyueremen|gcj|meijutt|hanjutv|fanju)/gi.test(pathname)) {
       return this.getType();

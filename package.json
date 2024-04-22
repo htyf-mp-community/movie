@@ -1,6 +1,6 @@
 {
   "name": "mini-apps-template",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "private": true,
   "description": "mini-apps-template",
   "templateInfo": {
@@ -364,8 +364,8 @@
     "@hongtangyun/react-native-utils": "0.1.2",
     "@hongtangyun/rooms-sdk": "0.10.20",
     "@hromovp/react-native-static-server": "0.5.5",
-    "@htyf-mp/engines": "0.0.51",
-    "@htyf-mp/js-sdk": "0.0.10",
+    "@htyf-mp/engines": "^0.0.52",
+    "@htyf-mp/js-sdk": "^0.0.10",
     "@miblanchard/react-native-slider": "2.6.0",
     "@native-base/icons": "0.0.11",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
