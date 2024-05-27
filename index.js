@@ -1,13 +1,20 @@
+/** 禁止修改此块代码 */
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
 import App from '@tarojs/rn-supporter/entry-file.js'
-import { AppRegistry, View, Text } from 'react-native'
-import { name as appName } from './app.json'
-import { MiniAppsEnginesProvider } from '@htyf-mp/engines'
-import SplashScreen from 'react-native-splash-screen';
-SplashScreen.hide()
-const Root = () => {
+import {MiniAppsEnginesProvider} from '@htyf-mp/engines'
+// keep the splash screen visible while complete fetching resources
+SplashScreen.preventAutoHideAsync();
+
+export default function Root() {
+  useEffect(() => {
+    SplashScreen.hideAsync();
+    return () => {
+
+    }
+  }, [])
   return <MiniAppsEnginesProvider>
     <App />
   </MiniAppsEnginesProvider>
 }
-
-AppRegistry.registerComponent(appName, () => Root)
+/** 禁止修改此块代码 */

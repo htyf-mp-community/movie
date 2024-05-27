@@ -1,6 +1,4 @@
 const path = require('path')
-const pkg = require('../package.json');
-const dgz = require('../project.dgz.json');
 
 const config = {
   projectName: 'mini-apps-template',
@@ -14,25 +12,15 @@ const config = {
   sourceRoot: 'src',
   outputRoot: 'dist',
   plugins: [],
+  defineConstants: {},
   copy: {
     patterns: [
-      { from: 'public/', to: 'dist/' },
+      { from: 'assets/', to: 'dist/' },
       // { from: 'dgz/build/outputs/app.json', to: 'dist/' },
       // { from: 'dgz/build/outputs/dist.zip', to: 'dist/' },
     ],
     options: {
     }
-  },
-  defineConstants: {
-    __APP_DEFINE_APPID__: `"${dgz.appid}"`,
-    /**
-     * app 版本号
-     */
-    __APP_DEFINE_VERSION__: `"${pkg.version}"`,
-    /**
-     * app 打包时间
-     */
-    __APP_DEFINE_BUILD_TIME__:`"${new Date().getTime()}"`,
   },
   framework: 'react',
   compiler: {
@@ -128,9 +116,6 @@ const config = {
       }
     }
   },
-  alias: {
-    '@': path.resolve(__dirname, '..', 'src')
-  }
 }
 
 module.exports = function (merge) {
