@@ -17,16 +17,18 @@
 
 ### 1. 安装依赖,时入项目根目录
 
-```
+```shell
 yarn
-```
-
-## 开发步骤
-
-### 1. 安装依赖,时入项目根目录
-
-```
-yarn
+# ios
+npm run ios
+# android
+npm run android
+# H5
+npm run dev:h5
+# 微信小程序
+npm run dev:weapp
+# 红糖云小程序(选真机调试)
+npm run dgz
 ```
 
 ## 注意事项
