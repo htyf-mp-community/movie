@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "DEVreactnativeboilerplate.app"
-               BlueprintName = "DEVreactnativeboilerplate"
-               ReferencedContainer = "container:DEVreactnativeboilerplate.xcodeproj">
+               BuildableName = "DEVhtyfmp.app"
+               BlueprintName = "DEVhtyfmp"
+               ReferencedContainer = "container:DEVhtyfmp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "DEVreactnativeboilerplateTests.xctest"
-               BlueprintName = "DEVreactnativeboilerplateTests"
-               ReferencedContainer = "container:DEVreactnativeboilerplate.xcodeproj">
+               BuildableName = "DEVhtyfmpTests.xctest"
+               BlueprintName = "DEVhtyfmpTests"
+               ReferencedContainer = "container:DEVhtyfmp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "DEVreactnativeboilerplate.app"
-            BlueprintName = "DEVreactnativeboilerplate"
-            ReferencedContainer = "container:DEVreactnativeboilerplate.xcodeproj">
+            BuildableName = "DEVhtyfmp.app"
+            BlueprintName = "DEVhtyfmp"
+            ReferencedContainer = "container:DEVhtyfmp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "DEVreactnativeboilerplate.app"
-            BlueprintName = "DEVreactnativeboilerplate"
-            ReferencedContainer = "container:DEVreactnativeboilerplate.xcodeproj">
+            BuildableName = "DEVhtyfmp.app"
+            BlueprintName = "DEVhtyfmp"
+            ReferencedContainer = "container:DEVhtyfmp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

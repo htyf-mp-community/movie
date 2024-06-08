@@ -1,4 +1,4 @@
-package com.watarumaeda.react_native_boilerplate.dev
+package com.watarumaeda.htyf_mp.dev
 
 import android.os.Build
 import android.os.Bundle
