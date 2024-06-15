@@ -41,6 +41,7 @@ function Index() {
   return (
     <View className="pages-index-wrap">
       <Text className="pages-index-loading">{msg}</Text>
+      <Text className="pages-index-loading">请耐心等待~</Text>
     </View>
   );
 }
