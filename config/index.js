@@ -58,7 +58,7 @@ const config = {
   },
   h5: {
     publicPath: '/',
-    staticDirectory: 'static',
+    staticDirectory: 'assets',
     postcss: {
       pxtransform: {
         enable: true,
