@@ -6,6 +6,7 @@ export async function auth() {
   let data = await getSearch(query);
   if (!data) {
     data = await getSearch(query, {
+      debug: true,
       timeout: 1000 * 60 * 3,
     });
   }
