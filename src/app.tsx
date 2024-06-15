@@ -10,7 +10,7 @@ function RootFix(props: any) {
   }, []);
   return <>{props.children}</>;
 }
-
+// @ts-ignore
 function App(props) {
   // 可以使用所有的 React Hooks
   useEffect(() => {});
