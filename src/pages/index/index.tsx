@@ -14,8 +14,6 @@ import jsCrawler, { host } from '@/utils/js-crawler';
 import jssdk from '@htyf-mp/js-sdk';
 import routes from '@/routes';
 
-console.log(jsCrawler);
-
 function Index() {
   const ui = useUI();
   const apps = useAppSelector(i => i.apps);
@@ -25,8 +23,12 @@ function Index() {
   const getData = useCallback(async () => {
     return new Promise(async resolve => {
       if (jssdk) {
+        const url = `${host}daoyongjiekoshibushiyoubing?q=我&f=_all&p=1`;
+        ui.showToast({
+          content: '加载数据中...',
+        });
         let data = await jssdk?.puppeteer({
-          url: `${host}`,
+          url: url,
           jscode: `${jsCrawler}`,
           debug: isDebug,
           wait: 2000,
@@ -36,7 +38,7 @@ function Index() {
         if (!data) {
           setMsg('请先进行验证真人操作...');
           data = await jssdk?.puppeteer({
-            url: `${host}`,
+            url: `${url}`,
             jscode: `${jsCrawler}`,
             debug: true,
             wait: 2000,
