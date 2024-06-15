@@ -13,52 +13,22 @@ import {
 import jsCrawler, { host } from '@/utils/js-crawler';
 import jssdk from '@htyf-mp/js-sdk';
 import routes from '@/routes';
+import { auth, getSearch } from '@/server/api';
 
 function Index() {
   const ui = useUI();
   const apps = useAppSelector(i => i.apps);
   const isDebug = apps?.__ENV__ === 'DEV';
-  const dispatch = useDispatch();
   const [msg, setMsg] = useState('验证资源...');
   const getData = useCallback(async () => {
     return new Promise(async resolve => {
       if (jssdk) {
-        const url = `${host}daoyongjiekoshibushiyoubing?q=我&f=_all&p=1`;
-        ui.showToast({
-          content: '加载数据中...',
-        });
-        let data = await jssdk?.puppeteer({
-          url: url,
-          jscode: `${jsCrawler}`,
-          debug: isDebug,
-          wait: 2000,
-          timeout: 1000 * 30,
-          callback: () => {},
-        });
-        if (!data) {
-          setMsg('请先进行验证真人操作...');
-          data = await jssdk?.puppeteer({
-            url: `${url}`,
-            jscode: `${jsCrawler}`,
-            debug: true,
-            wait: 2000,
-            timeout: 1000 * 60 * 10,
-            callback: () => {},
-          });
-        }
+        setMsg('正在验证真人操作...');
+        let data = await auth();
         resolve(data);
         navigate.relaunch({
           url: routes.pages.home,
         });
-        if (data?.items?.length) {
-          dispatch(
-            setHomeData({
-              ...data,
-              items: data?.items?.map(i => i.url),
-            }),
-          );
-          dispatch(setDBData(data?.items));
-        }
       }
     });
   }, [isDebug]);

@@ -21,6 +21,7 @@ import URLParse from 'url-parse';
 import lodash from 'lodash';
 import Item from '@/component/Item';
 import jssdk from '@htyf-mp/js-sdk';
+import { getHome } from '@/server/api';
 
 console.log(jsCrawler);
 
@@ -38,28 +39,7 @@ function Index() {
           content: '加载数据中...',
         });
         setLoading(true);
-        let data = await jssdk?.puppeteer({
-          url: `${host}`,
-          jscode: `${jsCrawler}`,
-          debug: isDebug,
-          wait: 2000,
-          timeout: 1000 * 30,
-          callback: () => {},
-        });
-        if (!data) {
-          ui.showToast({
-            content: '请先进行验证真人操作...',
-          });
-          data = await jssdk?.puppeteer({
-            url: `${host}`,
-            jscode: `${jsCrawler}`,
-            debug: true,
-            wait: 2000,
-            timeout: 1000 * 60 * 10,
-            callback: () => {},
-          });
-        }
-        resolve(data);
+        const data = getHome();
         if (data?.items?.length) {
           dispatch(
             setHomeData({
