@@ -5,6 +5,7 @@ export async function auth() {
   const query = { name: '我', page: 1 };
   let data = await getSearch(query, {
     debug: true,
+    wait: 0,
     timeout: 1000 * 60 * 3,
   });
   return !!data;
