@@ -3,13 +3,10 @@ import jssdk, { RequestOptions } from '@htyf-mp/js-sdk';
 
 export async function auth() {
   const query = { name: '我', page: 1 };
-  let data = await getSearch(query);
-  if (!data) {
-    data = await getSearch(query, {
-      debug: true,
-      timeout: 1000 * 60 * 3,
-    });
-  }
+  let data = await getSearch(query, {
+    debug: true,
+    timeout: 1000 * 60 * 3,
+  });
   return !!data;
 }
 
