@@ -77,12 +77,17 @@ class SDK extends EventEmitter {
     }
 
     try {
-      document.querySelector('.header').remove()
-      document.querySelector('.v-sort-nav').remove()
-      document.querySelector('.footer').remove()
+      const style = document.createElement('style');
+      const css = `
+        .home * { pointer-events: none; }
+        #header, .v-sort-nav, .footer{ display: none !important; }
+      `;
+      style.appendChild(document.createTextNode(css));
+      document.getElementsByTagName('head')[0].appendChild(style);
     } catch (error) {
       
     }
+    
   }
 
   getHome() {

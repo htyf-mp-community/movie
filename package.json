@@ -1,6 +1,6 @@
 {
   "name": "htyf-mp",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "run:scripts": "node ./scripts/index.js",
