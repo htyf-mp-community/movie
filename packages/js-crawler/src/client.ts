@@ -52,6 +52,29 @@ class SDK extends EventEmitter {
     } catch (error) {
       
     }
+    try {
+      // 定义要替换的文本
+      const targetText = window.location.host;
+      const replacementText = '影视基地';
+
+      // 遍历所有文本节点并进行替换
+      function replaceText(node) {
+          // 如果是文本节点，进行替换
+          if (node.nodeType === Node.TEXT_NODE) {
+              node.nodeValue = node.nodeValue.replace(new RegExp(targetText, 'g'), replacementText);
+          } else {
+              // 否则，遍历子节点进行替换
+              for (let child of node.childNodes) {
+                  replaceText(child);
+              }
+          }
+      }
+
+      // 从文档的body开始替换
+      replaceText(document.body);
+    } catch (error) {
+      
+    }
   }
 
   getHome() {
