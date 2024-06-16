@@ -75,6 +75,14 @@ class SDK extends EventEmitter {
     } catch (error) {
       
     }
+
+    try {
+      document.querySelector('.header').remove()
+      document.querySelector('.v-sort-nav').remove()
+      document.querySelector('.footer').remove()
+    } catch (error) {
+      
+    }
   }
 
   getHome() {
