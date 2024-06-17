@@ -36,6 +36,7 @@ module.exports = function (api) {
       ],
     ]
   }
+  console.log(process.env.EXPO_PUBLIC_PROJECT_ROOT)
   return {
     presets: presets,
     plugins: [

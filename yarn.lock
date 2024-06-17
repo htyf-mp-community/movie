@@ -2843,10 +2843,10 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@htyf-mp/engines@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.1.19.tgz#a4cb0916fe87f239dfe7c3ee55403963e4db6388"
-  integrity sha512-pIEdAPovFrSYHHG8HItc0tTQCtXYh4mOdUGzQ1gLzY1HZOuJtpp3/LlrqdH3DBJI1LJ9NzlWd9IO1pG3UzQ5pg==
+"@htyf-mp/engines@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.1.21.tgz#8895a45b7644acc5f13c6da8ade9980ae0f70cb2"
+  integrity sha512-sHxa8JdsNKAm/xJLhC3iBKkuusD5kdI8Lm7Dt20rX/ZK6PDDDbOcohuFFn2MkowTRapOP+A47VuwrerS2KtnGA==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -2878,10 +2878,10 @@
     systeminformation "^5.21.24"
     terser-webpack-plugin "^5.3.10"
     uuid "9.0.1"
-    webpack "^5.90.1"
-    webpack-cli "^5.1.4"
-    webpack-merge "^5.10.0"
-    yarn-add-no-save "^1.0.3"
+    webpack "5.90.1"
+    webpack-cli "5.1.4"
+    webpack-merge "5.10.0"
+    yarn-add-no-save "1.0.3"
 
 "@htyf-mp/js-sdk@0.0.11", "@htyf-mp/js-sdk@^0.0.11":
   version "0.0.11"
@@ -22745,7 +22745,7 @@ webpack-chain@6.5.1:
     deepmerge "^1.5.2"
     javascript-stringify "^2.0.1"
 
-webpack-cli@^5.1.4:
+webpack-cli@5.1.4:
   version "5.1.4"
   resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-5.1.4.tgz#c8e046ba7eaae4911d7e71e2b25b776fcc35759b"
   integrity sha512-pIDJHIEI9LR0yxHXQ+Qh95k2EvXpWzZ5l+d+jIo+RdSm9MiHfzazIxwwni/p7+x4eJZuvG1AJwgC4TNQ7NRgsg==
@@ -22861,14 +22861,7 @@ webpack-manifest-plugin@^4.1.1:
     tapable "^2.0.0"
     webpack-sources "^2.2.0"
 
-webpack-merge@^4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-4.2.2.tgz#a27c52ea783d1398afd2087f547d7b9d2f43634d"
-  integrity sha512-TUE1UGoTX2Cd42j3krGYqObZbOD+xF7u28WB7tfUordytSjbWTIjK/8V0amkBfTYN4/pB/GIDlJZZ657BGG19g==
-  dependencies:
-    lodash "^4.17.15"
-
-webpack-merge@^5.10.0, webpack-merge@^5.7.3:
+webpack-merge@5.10.0, webpack-merge@^5.7.3:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-5.10.0.tgz#a3ad5d773241e9c682803abf628d4cd62b8a4177"
   integrity sha512-+4zXKdx7UnO+1jaN4l2lHVD+mFvnlZQP/6ljaJVb4SZiwIKeUnrT5l0gkT8z+n4hKpC+jpOv6O9R+gLtag7pSA==
@@ -22876,6 +22869,13 @@ webpack-merge@^5.10.0, webpack-merge@^5.7.3:
     clone-deep "^4.0.1"
     flat "^5.0.2"
     wildcard "^2.0.0"
+
+webpack-merge@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-4.2.2.tgz#a27c52ea783d1398afd2087f547d7b9d2f43634d"
+  integrity sha512-TUE1UGoTX2Cd42j3krGYqObZbOD+xF7u28WB7tfUordytSjbWTIjK/8V0amkBfTYN4/pB/GIDlJZZ657BGG19g==
+  dependencies:
+    lodash "^4.17.15"
 
 webpack-obfuscator@3.5.1:
   version "3.5.1"
@@ -22897,7 +22897,7 @@ webpack-virtual-modules@^0.5.0:
   resolved "https://registry.yarnpkg.com/webpack-virtual-modules/-/webpack-virtual-modules-0.5.0.tgz#362f14738a56dae107937ab98ea7062e8bdd3b6c"
   integrity sha512-kyDivFZ7ZM0BVOUteVbDFhlRt7Ah/CSPwJdi8hBpkK7QLumUqdLtVfm/PX/hkcnrvr0i77fO5+TjZ94Pe+C9iw==
 
-webpack@5.92.0, webpack@^5.64.4, webpack@^5.90.1:
+webpack@5.90.1, webpack@5.92.0, webpack@^5.64.4:
   version "5.92.0"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.92.0.tgz#cc114c71e6851d220b1feaae90159ed52c876bdf"
   integrity sha512-Bsw2X39MYIgxouNATyVpCNVWBCuUwDgWtN78g6lSdPJRLaQ/PUVm/oXcaRAyY/sMFoKFQrsPeqvTizWtq7QPCA==
@@ -23416,7 +23416,7 @@ yargs@^17.3.1, yargs@^17.6.2, yargs@^17.7.2:
     y18n "^5.0.5"
     yargs-parser "^21.1.1"
 
-yarn-add-no-save@^1.0.3:
+yarn-add-no-save@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/yarn-add-no-save/-/yarn-add-no-save-1.0.3.tgz#03540f86802a46a86db83bc7357b248cd282315b"
   integrity sha512-ngmmxwYOogvYPjFDXGjoj35r/DteDzfiyoq5BI+kKSCCXW/I2gJA3KAgbm/7yFmcDE9CGSaORpNbYfglGYuxtA==
