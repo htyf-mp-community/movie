@@ -45,7 +45,7 @@ export function Header(props: HeaderProps) {
             className={classnames('pages-index-header-search-wrap')}
             onClick={() => {
               navigate.navigateTo({
-                url: navigate.routes.pages.search,
+                url: navigate.routes.pages.auth,
               });
             }}>
             <Image className="pages-index-header-search-icon" src={searchIcon} />

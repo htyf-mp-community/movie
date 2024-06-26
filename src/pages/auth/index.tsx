@@ -18,7 +18,7 @@ function Index() {
         resolve(data);
         if (data) {
           navigate.relaunch({
-            url: routes.pages.home,
+            url: routes.pages.search,
           });
         } else {
           setMsg('验证真人操作失败, 请重新验证！');
@@ -36,13 +36,22 @@ function Index() {
     <View className="pages-index-wrap">
       <Text className="pages-index-loading">{msg}</Text>
       <Text className="pages-index-loading">请耐心等待~</Text>
-      <Button
-        className="pages-index-btn"
-        onClick={() => {
-          getData();
-        }}>
-        重新验证
-      </Button>
+      <View className="pages-index-btn-wrap">
+        <Button
+          className="pages-index-btn"
+          onClick={() => {
+            getData();
+          }}>
+          重新验证
+        </Button>
+        <Button
+          className="pages-index-btn"
+          onClick={() => {
+            navigate.navigateBack();
+          }}>
+          返回上一页
+        </Button>
+      </View>
     </View>
   );
 }

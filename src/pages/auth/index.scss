@@ -23,3 +23,9 @@
 .pages-index-btn {
   width: 300px;
 }
+
+.pages-index-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

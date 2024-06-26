@@ -9,7 +9,7 @@ export const routes = {
   pages: {
     // 全局相关 start
     home: '/pages/home/index',
-    index: '/pages/index/index',
+    auth: '/pages/auth/index',
     404: '/pages/404/index',
     downlist: '/pages/downlist/index',
     search: '/pages/search/index',
@@ -20,10 +20,10 @@ export const routes = {
 /**
  * 第一页
  */
-export const indexPath = routes.pages.index;
+export const indexPath = routes.pages.home;
 /**
  * 启动路径（首页）
  */
-export const entryPath = routes.pages.index;
+export const entryPath = routes.pages.home;
 
 export default routes;
