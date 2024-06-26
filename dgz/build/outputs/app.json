@@ -2,7 +2,7 @@
   "type": "app",
   "name": "影视基地",
   "appid": "movie_996",
-  "version": "0.0.55",
+  "version": "0.0.56",
   "appUrlConfig": "https://raw.githubusercontent.com/htyf-mp-community/movie/main/dgz/build/outputs/app.json",
   "zipUrl": "https://raw.githubusercontent.com/htyf-mp-community/movie/main/dgz/build/outputs/dist.dgz"
 }

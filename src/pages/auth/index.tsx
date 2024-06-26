@@ -9,7 +9,7 @@ import { auth } from '@/server/api';
 function Index() {
   const apps = useAppSelector(i => i.apps);
   const isDebug = apps?.__ENV__ === 'DEV';
-  const [msg, setMsg] = useState('验证资源...');
+  const [msg, setMsg] = useState('为了数据安全, 请先验证真人操作!!!');
   const getData = useCallback(async () => {
     return new Promise(async resolve => {
       if (jssdk) {
@@ -27,11 +27,6 @@ function Index() {
     });
   }, [isDebug]);
 
-  useEffect(() => {
-    // initSearch();
-    getData();
-  }, []);
-
   return (
     <View className="pages-index-wrap">
       <Text className="pages-index-loading">{msg}</Text>
@@ -42,7 +37,7 @@ function Index() {
           onClick={() => {
             getData();
           }}>
-          重新验证
+          立即验证
         </Button>
         <Button
           className="pages-index-btn"
