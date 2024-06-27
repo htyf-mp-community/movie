@@ -17,7 +17,7 @@ function Index() {
         let data = await auth();
         resolve(data);
         if (data) {
-          navigate.relaunch({
+          navigate.redirectTo({
             url: routes.pages.search,
           });
         } else {
