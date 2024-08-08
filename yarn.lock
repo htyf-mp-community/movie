@@ -3074,10 +3074,10 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@htyf-mp/engines@0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.3.4.tgz#452c2f72d8b124ab92b10b7a8de75cb49a90f1c1"
-  integrity sha512-6uSuYL7TBN2Oiu7GRm6A5wZErH8HnRjr2KLT5dRQq4YbLYVBdY2unM06zyqMGJ1/vgFqDv5bhtKCoR6ppxK1vQ==
+"@htyf-mp/engines@0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.3.6.tgz#779d64681c772a672a91af1b41a4aa185640d3a9"
+  integrity sha512-gfn9rr/ddpmTKQims8ENzmwb7gHc8Tfx+VkYs8RSB8fd35xS1RLKcyYVB1ZtyPLdVWXZRJSrKS8XojX9QwY8Qg==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -3086,7 +3086,7 @@
     "@react-native-community/hooks" "^3.0.0"
     "@react-native-segmented-control/segmented-control" "^2.5.0"
     "@types/uuid" "^9.0.8"
-    adm-zip "^0.5.10"
+    adm-zip "0.5.10"
     babel-plugin-transform-remove-debugger "^6.9.4"
     dayjs "^1.11.10"
     delay "5"
@@ -6405,15 +6405,15 @@ adjust-sourcemap-loader@^4.0.0:
     loader-utils "^2.0.0"
     regex-parser "^2.2.11"
 
+adm-zip@0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.10.tgz#4a51d5ab544b1f5ce51e1b9043139b639afff45b"
+  integrity sha512-x0HvcHqVJNTPk/Bw8JbLWlWoo6Wwnsug0fnYYro1HBrjxZ3G7/AZk7Ahv8JwDe1uIcz8eBqvu86FuF1POiG7vQ==
+
 adm-zip@^0.4.13:
   version "0.4.16"
   resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.4.16.tgz#cf4c508fdffab02c269cbc7f471a875f05570365"
   integrity sha512-TFi4HBKSGfIKsK5YCkKaaFG2m4PEDyViZmEwof3MTIgzimHLto6muaHVpbrljdIvIrFZzEq/p4nafOeLcYegrg==
-
-adm-zip@^0.5.10:
-  version "0.5.12"
-  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.12.tgz#87786328e91d54b37358d8a50f954c4cd73ba60b"
-  integrity sha512-6TVU49mK6KZb4qG6xWaaM4C7sA/sgUMLy/JYMOzkcp3BvVLpW0fXDFQiIzAuxFCt/2+xD7fNIiPFAoLZPhVNLQ==
 
 agent-base@6:
   version "6.0.2"
