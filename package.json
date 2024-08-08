@@ -1,6 +1,6 @@
 {
   "name": "htyf-mp",
-  "version": "0.0.71",
+  "version": "0.0.72",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "prebuild": "npx expo prebuild --clean && npm run run:scripts",
