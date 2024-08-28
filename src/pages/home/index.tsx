@@ -21,6 +21,7 @@ import URLParse from 'url-parse';
 import lodash from 'lodash';
 import Item from '@/component/Item';
 import jssdk from '@htyf-mp/js-sdk';
+import AD from '@/component/AD';
 
 function Index() {
   const ui = useUI();
@@ -112,10 +113,10 @@ function Index() {
                 </View>
               </>
             ) : undefined}
-
             <View className="pages-home-box-title-wrap">
               <Text className="pages-home-box-title-text">热门推荐</Text>
             </View>
+            <AD />
             <View className="pages-home-items-wrap">
               {home?.items?.map(url => {
                 const urlObj = new URLParse(url, true);
