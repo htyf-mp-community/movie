@@ -56,12 +56,12 @@ export default defineAppConfig({
         iconPath: './assets/tabbar/tabbar_explore.png',
         text: '分类',
       },
-      {
-        pagePath: routes.pages.setting.slice(1),
-        selectedIconPath: './assets/tabbar/tabbar_me_on.png',
-        iconPath: './assets/tabbar/tabbar_me.png',
-        text: '我的',
-      },
+      // {
+      //   pagePath: routes.pages.setting.slice(1),
+      //   selectedIconPath: './assets/tabbar/tabbar_me_on.png',
+      //   iconPath: './assets/tabbar/tabbar_me.png',
+      //   text: '我的',
+      // },
     ],
   },
 });
