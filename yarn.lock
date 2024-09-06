@@ -3138,10 +3138,10 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@htyf-mp/engines@0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.5.3.tgz#b686fafc3b8f9512dd8c3137d06db0b1b75057fa"
-  integrity sha512-E2LLrfUsys1j0gxiE6SQomPBuk+FnUh9ooN4A8154/Xbw4YiHM3gwtjkRFxrdBkiOEUnS+ondtTR+OKhtlLI6g==
+"@htyf-mp/engines@^0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.5.4.tgz#cc526500a158504460e129db0cfc4976f949f2d6"
+  integrity sha512-D7jj/po9fcPRyeaZN4e12N2vrqPOTRB1H5vsuBZd40RiipDZuNdQKg7UPX1bMTNhk3w24lBgF22dbhAAVxxY2w==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -3177,7 +3177,7 @@
     webpack-merge "5.10.0"
     yarn-add-no-save "1.0.3"
 
-"@htyf-mp/js-sdk@0.0.17":
+"@htyf-mp/js-sdk@^0.0.17":
   version "0.0.17"
   resolved "https://registry.yarnpkg.com/@htyf-mp/js-sdk/-/js-sdk-0.0.17.tgz#930bef9f070a185485283ab1d6a15bf992a1800f"
   integrity sha512-A0d76/2WqujYfRoiQlwjzn1r+W4UOMV5d4Y906j42H8ESYaovXzF1jQt3Arg/BYpAwpIkiiLuzEQaFYDd5ijlg==
