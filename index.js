@@ -1,8 +1,11 @@
 /** 禁止修改此块代码 */
 import * as SplashScreen from 'expo-splash-screen';
+import App from './src'
 import { useEffect } from 'react';
-import App from '@tarojs/rn-supporter/entry-file.js'
-import {MiniAppsEnginesProvider} from '@htyf-mp/engines'
+import { MiniAppsEnginesProvider } from '@htyf-mp/engines'
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+
 // keep the splash screen visible while complete fetching resources
 SplashScreen.preventAutoHideAsync();
 
@@ -13,8 +16,12 @@ export default function Root() {
 
     }
   }, [])
-  return <MiniAppsEnginesProvider>
-    <App />
-  </MiniAppsEnginesProvider>
+  return <GestureHandlerRootView>
+    <SafeAreaProvider>
+      <MiniAppsEnginesProvider>
+        <App />
+      </MiniAppsEnginesProvider>
+    </SafeAreaProvider>
+  </GestureHandlerRootView>;
 }
 /** 禁止修改此块代码 */
