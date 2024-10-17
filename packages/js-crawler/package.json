@@ -1,6 +1,6 @@
 {
-  "name": "@dgz-js-crawler/movie",
-  "title": "@dgz-js-crawler/movie",
+  "name": "@js-crawler/movie",
+  "title": "@js-crawler/movie",
   "version": "0.0.1",
   "description": "TODO",
   "main": "dist/index.umd.js",
