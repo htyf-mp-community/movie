@@ -8,7 +8,7 @@ import { Appbar, MD2Colors } from 'react-native-paper';
 import lodash from 'lodash'
 import URLParse from 'url-parse';
 import jsCrawler, { host } from '@/utils/js-crawler';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function App() {
@@ -235,6 +235,20 @@ function App() {
     bottomSheetRef.current?.expand();
   }, []);
 
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        style={[props.style]}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+        pressBehavior="close"
+      />
+    ),
+    []
+  );
+
   const renderDetailItem = ({ item }) => (
     <View style={styles.detailItem}>
       <Text style={styles.detailLabel}>{item.label}</Text>
@@ -344,27 +358,29 @@ function App() {
         <Text style={styles.playButtonText}>选择播放列表</Text>
       </TouchableOpacity>
 
-      {/* Bottom Sheet for playlist */}
-      <BottomSheet
-        enablePanDownToClose
-        ref={bottomSheetRef}
-        index={-1}  // initial state is hidden
-        snapPoints={snapPoints}
-      >
-        <View style={[
-          styles.bottomSheetContent,
-          tw`pb-[${bottom}px]`
-        ]}>
-          <Text style={styles.sheetHeader}>播放列表：</Text>
-          <FlatList
-            data={movieDetail.playList}
-            renderItem={renderPlayItem}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={styles.playlist}
-          />
-        </View>
-      </BottomSheet>
+      
     </View>
+    {/* Bottom Sheet for playlist */}
+    <BottomSheet
+      backdropComponent={renderBackdrop}
+      enablePanDownToClose
+      ref={bottomSheetRef}
+      index={-1}  // initial state is hidden
+      snapPoints={snapPoints}
+    >
+      <View style={[
+        styles.bottomSheetContent,
+        tw`pb-[${bottom}px]`
+      ]}>
+        <Text style={styles.sheetHeader}>播放列表：</Text>
+        <FlatList
+          data={movieDetail.playList}
+          renderItem={renderPlayItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.playlist}
+        />
+      </View>
+    </BottomSheet>
   </View>;
 }
 
