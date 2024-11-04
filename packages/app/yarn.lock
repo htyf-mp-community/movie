@@ -2638,10 +2638,10 @@
     webpack-merge "5.10.0"
     yarn-add-no-save "1.0.3"
 
-"@htyf-mp/js-sdk@0.0.22":
-  version "0.0.22"
-  resolved "https://registry.npmmirror.com/@htyf-mp/js-sdk/-/js-sdk-0.0.22.tgz#e87b564a3e459936ce47ca7f6ef9b269c65d8fbd"
-  integrity sha512-9DoU+BSQ2FokqWyWwXGyxY+rdkQGKgfySXPuDUjwPFDGqGk9ZG7S2G8DE6aQu61lpkrHHISogHYYZ0XlKzZb/g==
+"@htyf-mp/js-sdk@0.0.23":
+  version "0.0.23"
+  resolved "https://registry.npmmirror.com/@htyf-mp/js-sdk/-/js-sdk-0.0.23.tgz#f1ecba499b3067291f2d7c8ca70388a10413bdf4"
+  integrity sha512-CeYhhjEL6F2e+CxDVyRumUP8xa/rNtgW8Lbev+X1iusxnyi7/DQKNAkrvGvhZWbMYPJlZrVxIm2XNP/AvTcPVQ==
   dependencies:
     "@fingerprintjs/fingerprintjs" "^3.3.3"
     "@react-native-async-storage/async-storage" "^2.0.0"
@@ -2659,6 +2659,7 @@
     qs "^6.10.3"
     queue "^6.0.2"
     react "^17.0.2"
+    react-native "^0.76.1"
     react-native-image-viewing "^0.2.2"
     react-native-permissions "^4.1.4"
     react-native-track-player "^4.0.1"
@@ -18382,7 +18383,7 @@ react-native-webview@13.12.3, react-native-webview@~11.23.0:
     escape-string-regexp "^4.0.0"
     invariant "2.2.4"
 
-react-native@*, react-native@0.74.5:
+react-native@*, react-native@0.74.5, react-native@^0.76.1:
   version "0.74.5"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.74.5.tgz#80e556690fc2583d46714d5618ecd30d93c24e81"
   integrity sha512-Bgg2WvxaGODukJMTZFTZBNMKVaROHLwSb8VAGEdrlvKwfb1hHg/3aXTUICYk7dwgAnb+INbGMwnF8yeAgIUmqw==

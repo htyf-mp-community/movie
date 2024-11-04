@@ -335,7 +335,9 @@ function App() {
 
             {/* 评分 */}
             <Text style={styles.rating}>评分: {movieDetail.rating}</Text>
-
+            {
+              jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
+            }
             {/* 详细信息 */}
             <FlatList
               data={movieDetail.moviedteail_list}
@@ -349,7 +351,6 @@ function App() {
           </View>
         </ScrollView>
       </View>
-
       {/* 底部播放按钮 */}
       <TouchableOpacity style={[
         styles.playButton,
@@ -357,8 +358,6 @@ function App() {
       ]} onPress={handleOpenBottomSheet}>
         <Text style={styles.playButtonText}>选择播放列表</Text>
       </TouchableOpacity>
-
-      
     </View>
     {/* Bottom Sheet for playlist */}
     <BottomSheet

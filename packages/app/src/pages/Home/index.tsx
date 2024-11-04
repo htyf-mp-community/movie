@@ -94,6 +94,7 @@ function Home() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={tw``}
+          
         />
         <Text style={tw`text-[18px] font-bold mb-[10px] ml-[10px]`}>热门影视</Text>
       </View>
@@ -138,6 +139,13 @@ function Home() {
       numColumns={numColumns}
       contentContainerStyle={tw`pl-[10px] pr-[10px]`}
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={getData} />}
+      ItemSeparatorComponent={() => {
+        return <>
+          {
+            jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
+          }
+        </>
+      }}
     />
   </View>;
 }

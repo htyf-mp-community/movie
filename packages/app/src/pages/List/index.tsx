@@ -210,6 +210,13 @@ const MovieListPage = () => {
             onEndReached={handleLoadMore} // 触发加载更多
             onEndReachedThreshold={0.1} // 距底部多远触发加载更多
             ListFooterComponent={() => <View style={tw`h-[180px] justify-start items-center`}>{(isLoadingMore && nextPage > 1) && <ActivityIndicator size="large" color="#0000ff" />}</View>}
+            ItemSeparatorComponent={() => {
+              return <>
+                {
+                  jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
+                }
+              </>
+            }}
           />
         </View>
       </View>
