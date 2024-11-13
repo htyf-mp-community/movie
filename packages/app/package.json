@@ -1,6 +1,6 @@
 {
   "name": "htyf-mp",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "prebuild": "npx expo prebuild --clean && npm run run:scripts",
@@ -62,8 +62,8 @@
     "@expo/metro-config": "0.18.11",
     "@expo/metro-runtime": "3.2.1",
     "@gorhom/bottom-sheet": "4.6.4",
-    "@htyf-mp/engines": "0.5.17",
-    "@htyf-mp/js-sdk": "0.0.22",
+    "@htyf-mp/engines": "^0.5.17",
+    "@htyf-mp/js-sdk": "^0.0.25",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@react-native-async-storage/async-storage": "2.0.0",
     "@react-native-camera-roll/camera-roll": "7.8.3",
@@ -326,6 +326,7 @@
     "jest": "29.3.1",
     "jest-expo": "~50.0.2",
     "lint-staged": "15.1.0",
+    "nativewind": "2.0.11",
     "patch-package": "8.0.0",
     "postcss": "8.4.33",
     "prettier": "3.1.0",
@@ -336,7 +337,6 @@
     "stylelint-scss": "5.3.1",
     "ts-node": "10.9.1",
     "typescript": "5.3.0",
-    "nativewind": "2.0.11",
     "webpack-merge": "5.10.0"
   },
   "private": true,
