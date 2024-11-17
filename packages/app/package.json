@@ -1,6 +1,6 @@
 {
   "name": "htyf-mp",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "prebuild": "npx expo prebuild --clean && npm run run:scripts",
@@ -62,7 +62,7 @@
     "@expo/metro-config": "0.18.11",
     "@expo/metro-runtime": "3.2.1",
     "@gorhom/bottom-sheet": "4.6.4",
-    "@htyf-mp/engines": "^0.5.17",
+    "@htyf-mp/engines": "^0.5.18",
     "@htyf-mp/js-sdk": "^0.0.25",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@react-native-async-storage/async-storage": "2.0.0",

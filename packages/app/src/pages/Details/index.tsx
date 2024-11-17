@@ -156,7 +156,10 @@ function App() {
               duration: 143,
               userAgent: data.userAgent,
               headers: {
-                ...(item?.headers || {}),
+                // ...(item?.headers || {}),
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Origin': item?.headers.Referer,
               },
               onPlayEnd: () => {
                 const list = lodash.cloneDeep(movieDetail?.playList || [])
