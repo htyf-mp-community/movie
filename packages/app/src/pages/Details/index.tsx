@@ -148,6 +148,7 @@ function App() {
           dispatch(setAduioData(item))
           resolve(item)
           if (hasPlay && item.source) {
+            const urlObj = new URLParse(item.url, true);
             jssdk.openVideoPlayer({
               url: item.source,
               title: item.name,
@@ -159,7 +160,7 @@ function App() {
                 // ...(item?.headers || {}),
                 'Cache-Control': 'no-cache',
                 'Connection': 'keep-alive',
-                'Origin': item?.headers.Referer,
+                'Origin': item?.headers?.Host || `${urlObj.origin}`,
               },
               onPlayEnd: () => {
                 const list = lodash.cloneDeep(movieDetail?.playList || [])
