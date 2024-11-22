@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Text, View, StyleSheet, ScrollView, Image, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import tw from 'twrnc';
-import { setAduioData, setDBData, setHistoryData, useAppSelector, useDispatch } from '@/_UIHOOKS_';
+import { BookItem, setAduioData, setDBData, setHistoryData, useAppSelector, useDispatch } from '@/_UIHOOKS_';
 import jssdk from '@htyf-mp/js-sdk';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Appbar, MD2Colors } from 'react-native-paper';
