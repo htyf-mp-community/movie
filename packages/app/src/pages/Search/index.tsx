@@ -15,7 +15,7 @@ export async function getSearch(
   query: { name: string; page: number },
   opt?: Partial<RequestOptions>,
 ) {
-  const url = `${host}daoyongjiekoshibushiyoubing?q=${query?.name}&f=_all&p=${query.page || 1}`;
+  const url = `${host}daoyongjiek0shibushiyoubing?q=${query?.name}&f=_all&p=${query.page || 1}`;
   const data = await jssdk?.puppeteer({
     url: url,
     jscode: `${jsCrawler}`,
