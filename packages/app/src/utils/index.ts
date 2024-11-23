@@ -1,44 +1,33 @@
-import React from "react";
-import asyncStorage, { AsyncStorageStatic } from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-import type {MMKV} from 'react-native-mmkv'
+import URLParse from 'url-parse';
 
-export const minisdkRef =  React.createRef<any>();
+export * from './asset'
+export * from './theme'
 
-let storage = asyncStorage;
-
-if (Platform.OS !== 'web') {
-  try {
-    const MMKV_KEY = `app_${__APP_DEFINE_APPID__}_storage`;
-    const Mmkv = require('react-native-mmkv').MMKV;
-    const ReactNativeBlobUtil = require('react-native-blob-util').default
-    const mmkvStorage = new Mmkv({
-      id: MMKV_KEY,
-      path: `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${MMKV_KEY}`,
-      encryptionKey: `${MMKV_KEY}_encryptionKey`
-    }) as MMKV;
-    storage = {
-      async getItem(key: string) {
-        const res = mmkvStorage.getString(key)
-        return res;
-      },
-
-      async setItem(key: string, data: string) {
-        return mmkvStorage.set(key, data)
-      },
-
-      async removeItem(key: string) {
-        return mmkvStorage.delete(key)
-      },
-
-      async clear(callback) {
-        mmkvStorage.clearAll()
-        callback?.();
-      }
-    } as AsyncStorageStatic
-  } catch (error) {
-    console.error('localStorage mmkv error: ', error)
-  }
+export const encodedVideoUri = (source: string, headers?: {}) => {
+  const __headers__ = encodeURI(JSON.stringify({
+    // ...(item.headers || {}),
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+      'Origin': headers?.Host || `${headers?.origin}`,
+  }));
+  const sourceObj = URLParse(source, true);
+  sourceObj.set('query', {
+      ...sourceObj.query,
+      __headers__: __headers__,
+  })
 }
 
-export const localStorage: AsyncStorageStatic = storage;
+export const decodeVideoUri = (url: string) => {
+  const _u = URLParse(url, true);
+  const _u2 = URLParse(url, true);
+  delete _u.query['__headers__']
+  _u.set('query', {
+    ..._u.query,
+  })
+  const __headers__ = _u2?.query?.__headers__;
+  const headers = __headers__ ? JSON.parse(decodeURI(__headers__)) : {};
+  return {
+    url: _u.toString(),
+    headers: headers,
+  }
+}
