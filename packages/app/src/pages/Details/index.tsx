@@ -31,6 +31,9 @@ function App() {
     const pathname = urlObj.pathname;
     return lodash.get(db, `${pathname}`, undefined);
   }, [db, url]) as BookItem;
+  const playList = useMemo(() => {
+    return movieDetail?.playList;
+  }, [movieDetail])
 
   const historyInfo = useMemo(() => {
     return lodash.get(apps?.history, `${url}`, undefined);
@@ -377,7 +380,7 @@ function App() {
       ]}>
         <Text style={styles.sheetHeader}>播放列表：</Text>
         <FlatList
-          data={movieDetail.playList?.reverse()}
+          data={playList}
           renderItem={renderPlayItem}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={styles.playlist}
