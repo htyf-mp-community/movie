@@ -377,7 +377,7 @@ function App() {
       ]}>
         <Text style={styles.sheetHeader}>播放列表：</Text>
         <FlatList
-          data={movieDetail.playList}
+          data={movieDetail.playList?.reverse()}
           renderItem={renderPlayItem}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={styles.playlist}
