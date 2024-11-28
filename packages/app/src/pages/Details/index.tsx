@@ -32,7 +32,8 @@ function App() {
     return lodash.get(db, `${pathname}`, undefined);
   }, [db, url]) as BookItem;
   const playList = useMemo(() => {
-    return movieDetail?.playList;
+    const list = lodash.cloneDeep(movieDetail?.playList || [])?.reverse()
+    return list;
   }, [movieDetail])
 
   const historyInfo = useMemo(() => {
