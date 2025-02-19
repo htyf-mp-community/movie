@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, FlatList, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import lodash from 'lodash';
-import { setDBData, setHomeData, useAppSelector, useDispatch } from '@/_UIHOOKS_';
+import { setDBData, setHomeData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
 import jssdk from '@htyf-mp/js-sdk'
 import Item from '@/components/item';
-import jsCrawler, { host } from '@/utils/js-crawler';
 
 const numColumns = 2;
 
 function Home() {
+  const ui = useUI();
   const apps = useAppSelector(i => i.apps)
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -21,42 +21,23 @@ function Home() {
 
   const getData = useCallback(async () => {
     return new Promise(async resolve => {
-      if (jssdk) {
-        setIsRefreshing(true);
-        try {
-          let data = await jssdk?.puppeteer({
-            url: `${host}`,
-            jscode: `${jsCrawler}`,
-            debug: isDebug,
-            wait: 2000,
-            timeout: 1000 * 10,
-            callback: () => {},
-          });
-          if (!data) {
-            data = await jssdk?.puppeteer({
-              url: `${host}`,
-              jscode: `${jsCrawler}`,
-              debug: isDebug,
-              wait: 2000,
-              timeout: 1000 * 60 * 10,
-              callback: () => {},
-            });
-          }
-          resolve(data);
-          if (data?.items?.length) {
-            dispatch(
-              setHomeData({
-                ...data,
-                items: data?.items?.map(i => i.url),
-              }),
-            );
-            dispatch(setDBData(data?.items));
-          }
-        } catch (error) {
-          
-        } finally {
-          setIsRefreshing(false);
+      setIsRefreshing(true);
+      try {
+        const data = await ui.getHomeVideoList();
+        resolve(data);
+        if (data[0]) {
+          dispatch(
+            setHomeData({
+              ...data,
+              items: data[0]?.videos?.map(i => i.href),
+            }),
+          );
+          dispatch(setDBData(data[0]?.videos));
         }
+      } catch (error) {
+        console.error('error', error)
+      } finally {
+        setIsRefreshing(false);
       }
     });
   }, [isDebug]);
@@ -85,7 +66,7 @@ function Home() {
               onPress={(info: any) => {
                 navigation.navigate(`Details`, {
                   name: info.name,
-                  url: encodeURIComponent(info.url)
+                  url: encodeURIComponent(info.href)
                 })
               }}
             />
@@ -132,7 +113,7 @@ function Home() {
           onPress={(info: any) => {
             navigation.navigate(`Details`, {
               name: info.name,
-              url: encodeURIComponent(info.url)
+              url: encodeURIComponent(info.href)
             })
           }}
         />

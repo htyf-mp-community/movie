@@ -2599,10 +2599,10 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@htyf-mp/engines@^0.5.18":
-  version "0.5.18"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.5.18.tgz#80168dbf37336a3fdc49cf4e1ed76acd3b679de6"
-  integrity sha512-R1UXYne3FzS5fu2wRQUqqxUD2Gcl3CrYmtW+jTsvsminkj1WdxQWPMI+OXgwwmH0Oq3unuZrm+YsEbAu0/KnoA==
+"@htyf-mp/engines@^0.5.21":
+  version "0.5.21"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/engines/-/engines-0.5.21.tgz#b6896262776c91900c1c2f234fc8ed2e064b333a"
+  integrity sha512-Q7+wt7J7500qg+lChPbYAx2Bax+rDXLF7ctpHNDKHm0fBhsii/It4SSBN5iYzR39KfWwuTSQPmHGnVDuhGMsvA==
   dependencies:
     "@callstack/repack" "^3.7.0"
     "@gorhom/bottom-sheet" "^4.6.0"
@@ -2638,10 +2638,10 @@
     webpack-merge "5.10.0"
     yarn-add-no-save "1.0.3"
 
-"@htyf-mp/js-sdk@^0.0.27":
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/@htyf-mp/js-sdk/-/js-sdk-0.0.27.tgz#6137a4f3373081301aad0db36cdc2639979e50ce"
-  integrity sha512-AZAoenrBtolQYUWmAywQwmOIvxsNZdYdwdXBT/Uq57sBbyTNF/4RY+RPO/6lvjrmkgmLXCoC2ShKYdP00yJO9w==
+"@htyf-mp/js-sdk@^0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@htyf-mp/js-sdk/-/js-sdk-0.0.28.tgz#4773ef65b869dac6f8328e7461999971d3db57c9"
+  integrity sha512-tSWJSl50YpOsjUMSPSL+A5n80i2in7KsAEv9aJS0i0pplVYS+Tix58QWIzXh1XzyRbkwcR/8YR9WtBzGsMILUg==
   dependencies:
     "@fingerprintjs/fingerprintjs" "^3.3.3"
     "@react-native-async-storage/async-storage" "^2.0.0"

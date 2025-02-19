@@ -1,40 +1,46 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Text, View, StyleSheet, ScrollView, Image, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import tw from 'twrnc';
-import { BookItem, setAduioData, setDBData, setHistoryData, useAppSelector, useDispatch } from '@/_UIHOOKS_';
+import { setDBVideoSources, setHistoryData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
 import jssdk from '@htyf-mp/js-sdk';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Appbar, MD2Colors } from 'react-native-paper';
 import lodash from 'lodash'
 import URLParse from 'url-parse';
-import jsCrawler, { host } from '@/utils/js-crawler';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TVideo, TVideoSourcesItem } from '@/services';
+import type { RootStackParamList } from '..';
 
 function App() {
+  const router = useRoute();
+  const params = router.params as RootStackParamList['Details'];
+  const url = decodeURIComponent(`${params?.url}`);
+  const ui = useUI();
   const {bottom} = useSafeAreaInsets();
   const bottomSheetRef = useRef(null);
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const router = useRoute();
   const apps = useAppSelector(i => i.apps);
   const isDebug = apps?.__ENV__ === 'DEV';
   const db = useAppSelector(i => i.apps?.db || {});
+  const dbVideoSources = useAppSelector(i => i.apps?.dbVideoSources?.[url] || {});
   const [refreshing, setRefreshing] = useState(false);
   const [playLoading, setPlayLoading] = useState(false);
-  const params = router.params;
 
-  const url = decodeURIComponent(`${params?.url}`);
+
   const snapPoints = useMemo(() => ['25%', '50%'], []);
+
   const movieDetail = useMemo(() => {
     const urlObj = URLParse(url, true);
     const pathname = urlObj.pathname;
     return lodash.get(db, `${pathname}`, undefined);
-  }, [db, url]) as BookItem;
+  }, [db, url]) as TVideo;
+
   const playList = useMemo(() => {
-    const list = lodash.cloneDeep(movieDetail?.playList || [])?.reverse()
+    const list = lodash.cloneDeep(dbVideoSources?.['source'] || [])?.reverse()
     return list;
-  }, [movieDetail])
+  }, [dbVideoSources])
 
   const historyInfo = useMemo(() => {
     return lodash.get(apps?.history, `${url}`, undefined);
@@ -48,24 +54,14 @@ function App() {
       if (jssdk) {
         setRefreshing(true)
         try {
-          const urlObj = new URLParse(url, true);
-          const data = await jssdk?.puppeteer({
-            url: urlObj.set('origin', host?.replace(/\/$/gi, '')).toString(),
-            jscode: `${jsCrawler}`,
-            debug: isDebug,
-            wait: 2000,
-            timeout: 1000 * 30,
-            callback: () => {},
-          });
+          const data = await ui.getVideoSources(url);
           resolve(data);
-          if (data?.playList?.length) {
-            dispatch(
-              setDBData({
-                ...data,
-                url: url,
-              }),
-            );
-          }
+          dispatch(
+            setDBVideoSources({
+              href: url,
+              videoSources: data,
+            }),
+          );
         } catch (error) {
           
         } finally {
@@ -84,157 +80,24 @@ function App() {
       if (jssdk) { 
         setPlayLoading(true)
         try {
-          const urlObj = new URLParse(url, true);
-          const data = await jssdk?.puppeteer({
-            url: urlObj.set('origin', host?.replace(/\/$/gi, '')).toString(),
-            jscode: `${jsCrawler}`,
-            debug: isDebug,
-            wait: 2000,
-            timeout: 1000 * 30,
-            callback: () => {}
-          })
-          const item = {
-            time: Date.now(),
-            url: url,
-            name: data?.name,
-            source: data.isIframe ? '' : data?.url,
-            file: '',
-            headers: {
-              Host: URLParse(data?.url).host,
-              "user-agent": data?.userAgent,
-              Referer: data?.referer,
-              Cookie: data?.cookie,
+          const data = await ui.getVideoUrl(url);
+          console.error(data);
+          jssdk.openVideoPlayer({
+            url: data.url,
+            title: movieDetail.title,
+            headers: data.headers,
+            onPlayEnd: () => {
+              
             },
-          }
-          if (!data.isIframe && data.url) {
-            // playback();
-          } else {
-            const getHtml = (htmUrl: string): Promise<string> => {
-              return new Promise(async (resolve, reject) => {
-                try {
-                  const res = await fetch(htmUrl, {
-                    headers: {
-                      "content-type": "text/html; charset=UTF-8",
-                      "referer": `${host}`,
-                      "sec-ch-ua": `"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"`,
-                      "sec-ch-ua-mobile": `?0`,
-                      "sec-ch-ua-platform": `"macOS"`,
-                      "sec-fetch-dest": `iframe`,
-                      "sec-fetch-mode": `navigate`,
-                      "sec-fetch-site": `cross-site`,
-                    }
-                  })
-                  resolve(res.text())
-                } catch (error) {
-                  reject(error)
-                }
-              })
-            }
-            const iframeOright = URLParse(data.url).origin;
-            let iframeHtml = await getHtml(data.url);
-            iframeHtml = `${iframeHtml}`.replace(/src="\/\//gi, `src="https://`).replace(/src="\//gi, `src="${iframeOright}/`)
-            const res = await getIframData(data.url, iframeHtml, {
-              "referer": `${host}`,
-              "sec-fetch-dest": `iframe`,
-              "sec-fetch-mode": `navigate`,
-              "sec-fetch-site": `cross-site`,
-            })
-          
-            item['source'] = res?.source;
-            item['headers'] = {
-              ...(item['headers'] || {}),
-              Host: URLParse(res?.url).host,
-              "user-agent": res?.userAgent,
-              Referer: res?.referer,
-              Cookie: res?.cookie,
-            };
-          }
-          dispatch(setAduioData(item))
-          resolve(item)
-          if (hasPlay && item.source) {
-            const urlObj = new URLParse(item.url, true);
-            jssdk.openVideoPlayer({
-              url: item.source,
-              title: item.name,
-              artist: `test`,
-              artwork: `${movieDetail?.img}`,
-              duration: 143,
-              userAgent: data.userAgent,
-              headers: {
-                // ...(item?.headers || {}),
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-                'Origin': item?.headers?.Host || `${urlObj.origin}`,
-              },
-              onPlayEnd: () => {
-                const list = lodash.cloneDeep(movieDetail?.playList || [])
-                const index = list.findIndex(i => i.url === url)
-                const nextObj = lodash.get(list, `${index+1}`, {})
-                if (nextObj.url) {
-                  // getData(nextObj.url, true)
-                  // dispatch(setHistoryData({
-                  //   url: bookUrl,
-                  //   playUrl: nextObj.url,
-                  //   time: Date.now(),
-                  // }))
-                }
-              },
-              onPlayError: () => {
+            onPlayError: () => {
 
-              }
-            })
-            // if (bookInfo?.playList && bookInfo?.playList?.length) {
-            //   for (const key in book Info?.playList) {
-            //     if (isShow.current) {
-            //       const element = bookInfo?.playList[key];
-            //       await getData(element.url)
-            //     }
-            //   }
-            // }
-          }
+            }
+          })
         } catch (error) {
           
         } finally {
           setPlayLoading(false)
         }
-      }
-    })
-  }, [movieDetail, isDebug])
-
-  const getIframData = useCallback(async (url: string, html: string, headers?: {[key: string]: string;}): Promise<any> => {
-    return new Promise(async (resolve) => {
-      if (!url) {
-        resolve('')
-        return;
-      }
-      if (jssdk) {
-        const htmlEncodeString = encodeURIComponent(`${html}`)
-        const data = await jssdk?.puppeteer({
-          url: `${url}`,
-          jscode: `function(callback) {
-            try {
-              if (!window.__global_document_write__) {
-                var html = decodeURIComponent("${htmlEncodeString}");
-                document.write(html);
-                window.__global_document_write__ = true;
-              }
-            } catch (error) {
-              alert(error)  
-            }
-            (${jsCrawler})(callback)
-          }`,
-          headers: {
-            'userAgent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            ...(headers || {}),
-          },
-          debug: isDebug,
-          wait: 2000,
-          timeout: 1000 * 30,
-          callback: () => {}
-        })
-        resolve({
-          source: data?.url,
-        })
       }
     })
   }, [movieDetail, isDebug])
@@ -264,8 +127,8 @@ function App() {
     </View>
   );
 
-  const renderPlayItem = ({ item }) => {
-    const itemUrlObj = new URLParse(`${item.url}`);
+  const renderPlayItem = ({ item }: {item: TVideoSourcesItem }) => {
+    const itemUrlObj = new URLParse(`${item.href}`);
     const hisUrlObj = new URLParse(`${historyInfo?.playUrl}`);
     const hisBtn = itemUrlObj.pathname === hisUrlObj.pathname;
     const loading = hisBtn && playLoading;
@@ -281,13 +144,13 @@ function App() {
         dispatch(
           setHistoryData({
             url: url,
-            playUrl: item.url,
+            playUrl: item.href,
             time: Date.now(),
           }),
         );
-        getPlayUrl(item.url, true)
+        getPlayUrl(item.href, true)
       }}>
-        <Text style={styles.playText}>{item.name}</Text>
+        <Text style={styles.playText}>{item.ep}</Text>
         {
           loading ? 
           <View
@@ -338,24 +201,24 @@ function App() {
         >
           <View style={tw`p-[16px]`}>
             {/* 封面图和标题 */}
-            <Image source={{ uri: movieDetail.img }} style={styles.movieImage} />
-            <Text style={styles.movieTitle}>{movieDetail.name}</Text>
+            <Image source={{ uri: movieDetail?.img }} style={styles.movieImage} />
+            <Text style={styles.movieTitle}>{movieDetail?.title}</Text>
 
             {/* 评分 */}
-            <Text style={styles.rating}>评分: {movieDetail.rating}</Text>
+            <Text style={styles.rating}>评分: {movieDetail?.rating}</Text>
             {
               jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
             }
             {/* 详细信息 */}
             <FlatList
-              data={movieDetail.moviedteail_list}
+              data={movieDetail?.moviedteail_list}
               renderItem={renderDetailItem}
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.detailList}
             />
 
             {/* 电影简介 */}
-            <Text style={styles.context}>{movieDetail.yp_context}</Text>
+            <Text style={styles.context}>{movieDetail?.yp_context}</Text>
           </View>
         </ScrollView>
       </View>
@@ -384,7 +247,6 @@ function App() {
           data={playList}
           renderItem={renderPlayItem}
           keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.playlist}
         />
       </View>
     </BottomSheet>

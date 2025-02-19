@@ -1,19 +1,15 @@
+import React, { memo } from 'react'
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
-import React, { forwardRef, memo, useEffect } from 'react'
-import { StoreProvider, UIProvider, useAppSelector } from '@/_UIHOOKS_'
+import { NavigationContainer } from '@react-navigation/native';
+import { StoreProvider, UIProvider } from '@/_UIHOOKS_'
 
 import createRouter from './router'
-import { NavigationContainer } from '@react-navigation/native';
 
 const RootStack = createStackNavigator();
 
 const router = createRouter();
 
 function RootFix(props: any) {
-  const appStore = useAppSelector(i => i);
-  useEffect(() => {
-    console.log(appStore)
-  }, [])
   return <RootStack.Navigator
     initialRouteName={'MainScreen'}
     screenOptions={{
@@ -32,7 +28,7 @@ function RootFix(props: any) {
 }
 
 
-const MiniApp = forwardRef(({ dataSupper, minisdk }: any, ref) => {
+const MiniApp = () => {
   return (
     <NavigationContainer>
       <StoreProvider>
@@ -42,7 +38,7 @@ const MiniApp = forwardRef(({ dataSupper, minisdk }: any, ref) => {
       </StoreProvider>
     </NavigationContainer>
   );
-});
+};
 
 
 export default memo(MiniApp);

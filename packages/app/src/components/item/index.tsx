@@ -17,7 +17,9 @@ export default function Item(props: {url: string, onPress?: (info: any) => void}
   }, [apps.db])
   return <TouchableOpacity style={styles.itemContainer} onPress={() => props?.onPress?.(info)}>
     <Image source={{ uri: info?.img }} style={styles.image} />
-    <Text style={styles.title}>{info?.name?.replace(/[\n\s]/g, '') || '---'}</Text>
+    <Text style={styles.title}>
+      {info?.title?.replace(/[\n\s]/g, '') || '---'}
+    </Text>
   </TouchableOpacity>
 }
 

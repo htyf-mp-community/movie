@@ -20,12 +20,12 @@ const rootReducer = combineReducers({
 
 
 const persistedReducer = persistReducer({
-  key: `__APP_${APP_APPID}_${APP_VERSION}__`,
+  key: `__APP_${APP_APPID}_${APP_VERSION}_1__`,
   // 持久化数据版本
   version: Number(`${APP_VERSION}`?.replace(/\./gi, '0')),
   // 需要持久化的 slice 名称
   whitelist: [
-    'apps'
+    // 'apps'
   ],
   storage: {
     async getItem(key: string) {

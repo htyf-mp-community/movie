@@ -1,7 +1,7 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text } from 'react-native'
+import React, { ReactNode, useEffect, useState } from 'react';
+import { View, Text } from 'react-native';
+import { TVService, TVideoProvider } from '@/services';
 import { useAppSelector } from './store';
-
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -19,14 +19,14 @@ export const UIProvider = (props: UIProviderProps) => {
   const [isClient, setIsClient] = useState(false)
   const apps = useAppSelector(state => state.apps);
   const { __ENV__ } = apps;
-
+  
   useEffect(() => {
     setIsClient(true)
   }, [])
 
   return <UIContext.Provider
     value={{
-     
+      ...TVService.czzy,
     } as SDKType}
   >
     {
@@ -52,9 +52,6 @@ export function useUI(): SDKType {
   return sdk || {};
 }
 
-export interface SocketConfig {
- 
-}
-
-export type SDKType = {
+export interface SDKType extends TVideoProvider {
+  
 }

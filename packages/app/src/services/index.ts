@@ -1,9 +1,9 @@
 import { TVideoProvider } from './types'
-import * as sample from './czzy'
+import * as czzy from './czzy'
 
 export * from './types'
 
 
 export const TVService: Record<string, TVideoProvider> = {
-    sample,
+  czzy,
 } as const

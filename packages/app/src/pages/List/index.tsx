@@ -3,7 +3,6 @@ import jsCrawler, { host } from '@/utils/js-crawler';
 import tw from 'twrnc';
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import jssdk from '@htyf-mp/js-sdk';
 import { useImmer } from 'use-immer';
 import lodash from 'lodash';
@@ -85,7 +84,7 @@ const MovieListPage = () => {
             const data = await jssdk?.puppeteer({
               url: url,
               jscode: `${jsCrawler}`,
-              debug: isDebug,
+              debug: true,
               wait: 2000,
               timeout: 1000 * 30,
               callback: () => {},

@@ -47,6 +47,7 @@
     "StoreKit"
   ],
   "dependencies": {
+    "@js-crawler/movie": "workspace:*",
     "@ant-design/icons-react-native": "2.3.2",
     "@ant-design/react-native": "5.2.3",
     "@babel/core": "7.25.7",
@@ -62,8 +63,8 @@
     "@expo/metro-config": "0.18.11",
     "@expo/metro-runtime": "3.2.1",
     "@gorhom/bottom-sheet": "4.6.4",
-    "@htyf-mp/engines": "^0.5.18",
-    "@htyf-mp/js-sdk": "^0.0.27",
+    "@htyf-mp/engines": "^0.5.21",
+    "@htyf-mp/js-sdk": "^0.0.28",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@react-native-async-storage/async-storage": "2.0.0",
     "@react-native-camera-roll/camera-roll": "7.8.3",

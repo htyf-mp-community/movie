@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import lodash from 'lodash';
 import URLParse from 'url-parse';
+import { TVideo, TVideoSources, TVService } from '@/services'
 
 enum ENV_ENUM {
   'MASTER',
@@ -55,12 +56,13 @@ export interface AppsState {
   __ENV__: keyof typeof ENV_ENUM;
   __HOST__: keyof typeof HOST_ENUM;
   token: string;
+  source: keyof typeof TVService,
   db: {
-    [key: string]: BookItem
+    [key: string]: TVideo
   };
-  audios: {
-    [key: string]: AudioItem
-  };
+  dbVideoSources: {
+    [key: string]: TVideoSources
+  },
   home: {
     items: Array<string>
   },
@@ -73,13 +75,14 @@ export interface AppsState {
 
 // 定义一个初始状态
 const initialState: AppsState = {
+  source: '',
   __ENV__: ENV_ENUM[ENV_ENUM['MASTER']],
   __HOST__: HOST_ENUM[HOST_ENUM['https://mini.xx.com/api']],
   token: '',
   db: {},
+  dbVideoSources: {},
   home: {},
   history: {},
-  audios: {},
 } as AppsState;
 
 const counterSlice = createSlice({
@@ -95,7 +98,6 @@ const counterSlice = createSlice({
       state.home = {
         items: []
       };
-      state.audios = {};
     },
 
     setEnv: (state, action: PayloadAction<AppsState['__ENV__']>) => {
@@ -111,26 +113,12 @@ const counterSlice = createSlice({
       }
     },
  
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
-    },
-    logout: (state) => {
-      state.token = '';
-    },
-
-    setAppData: (state, action: PayloadAction<AppsState>) => {
-      for (const key in action.payload) {
-        state[key] = action.payload[key];
-      }
-      debugger
-    },
-
     setHomeData: (state, action: PayloadAction<AppsState['home']>) => {
       state.home = action.payload;
     },
 
-    setDBData: (state, action: PayloadAction<BookItem | Array<BookItem>>) => {
-      let arr: Array<BookItem> = []
+    setDBData: (state, action: PayloadAction<TVideo[] | TVideo>) => {
+      let arr: Array<TVideo> = []
       if (action.payload) {
         if (lodash.isArray(action.payload)) {
           arr.push(...action.payload)
@@ -143,9 +131,9 @@ const counterSlice = createSlice({
         for (const key in arr) {
           const element = arr[key];
           if (element && lodash.isObject(element)) {
-            const url = lodash.get(element, 'url')
-            if (url) {
-              const urlObj = URLParse(url, true)
+            const href = lodash.get(element, 'href')
+            if (href) {
+              const urlObj = URLParse(href, true)
               const pathname = urlObj.pathname;
               let preInfo = lodash.get((state.db || {}), pathname, {})
               state.db[pathname] = lodash.merge(preInfo, element)
@@ -155,13 +143,9 @@ const counterSlice = createSlice({
       }
     },
 
-    setAduioData: (state, action: PayloadAction<AudioItem>) => {
-      const url = `${action.payload.url}`;
-      if (!state.audios) {
-        state.audios = {}
-      }
-      let preAudioInfo = lodash.get((state.audios || {}), url, {})
-      state.audios[url] = lodash.merge(preAudioInfo, action.payload)
+    setDBVideoSources: (state, action: PayloadAction<{href: string, videoSources: TVideoSources}>) => {
+      const {href, videoSources} = action.payload;
+      state.dbVideoSources[href] = videoSources;
     },
 
     setHistoryData: (state, action: PayloadAction<HistoryItem>) => {
@@ -175,6 +159,6 @@ const counterSlice = createSlice({
   },
 });
 // 每个 case reducer 函数会生成对应的 Action creators
-export const {setEnv, appStoreInit, setToken, logout, setAppData, setHomeData, setDBData, setAduioData, setHistoryData} = counterSlice.actions;
+export const {setEnv, appStoreInit, setHomeData, setDBData, setDBVideoSources, setHistoryData} = counterSlice.actions;
 
 export default counterSlice.reducer;

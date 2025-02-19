@@ -1,15 +1,15 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, RefreshControl } from 'react-native';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl } from 'react-native';
 import tw from 'twrnc';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import lodash from 'lodash';
-import { setDBData, useAppSelector, useDispatch } from '@/_UIHOOKS_';
+import { setDBData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
 import { useImmer } from 'use-immer';
 import jssdk, { RequestOptions } from '@htyf-mp/js-sdk'
 import Item from '@/components/item';
 import jsCrawler, { host } from '@/utils/js-crawler';
 import { useNavigation } from '@react-navigation/native';
 import { Appbar } from 'react-native-paper';
+import { TVideo } from '@/services';
 
 export async function getSearch(
   query: { name: string; page: number },
@@ -41,13 +41,14 @@ export async function auth() {
 let isF = true;
 
 const MovieSearchPage = () => {
+  const ui = useUI();
   const flatListRef = useRef<FlatList>(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const apps = useAppSelector(i => i.apps);
-  const [dataObj, setDataObj] = useImmer<{ [key: string]: any[] }>({});
+  const [dataObj, setDataObj] = useImmer<{ [key: string]: TVideo[] }>({});
   const [searchword, setSearchword] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -68,26 +69,20 @@ const MovieSearchPage = () => {
             setLoading(true);
             if (isF) {
               isF = false;
-              await auth();
+              // await auth();
             }
-            const data = await getSearch({
-              name: searchword,
-              page: page,
+            const data = await ui.getVideoSearchResult(searchword, page);
+            dispatch(setDBData(data?.list));
+            setDataObj(_dataObj => {
+              if (page === 1) {
+                return {
+                  1: data.list,
+                };
+              }
+              _dataObj[page] = data.list;
+              return _dataObj;
             });
-            console.error(data);
             resolve(data);
-            if (data?.items?.length) {
-              dispatch(setDBData(data?.items));
-              setDataObj(_dataObj => {
-                if (page === 1) {
-                  return {
-                    1: data,
-                  };
-                }
-                _dataObj[page] = data;
-                return _dataObj;
-              });
-            }
             setLoading(false);
           }
         } catch (error) {
@@ -101,7 +96,7 @@ const MovieSearchPage = () => {
   );
 
   const list = useMemo(() => {
-    const _list: Array<BookItem> = [];
+    const _list: Array<TVideo> = [];
     for (const key in dataObj) {
       const items: any = lodash.get(dataObj, `[${key}]['items']`, []);
       _list.push(...items);
