@@ -215,7 +215,7 @@ function App() {
             try {
               if (!window.__global_document_write__) {
                 var html = decodeURIComponent("${htmlEncodeString}");
-                document.write(html);
+                // document.write(html);
                 window.__global_document_write__ = true;
               }
             } catch (error) {

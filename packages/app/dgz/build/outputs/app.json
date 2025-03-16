@@ -1,1 +1,8 @@
-{"type":"app","name":"影视基地","appid":"movie_996__dev__","version":"0.1.12.1732789759702","appUrlConfig":"http://172.16.16.50:8000/app.json","zipUrl":"http://172.16.16.50:8000/dist.dgz"}
+{
+  "type": "app",
+  "name": "影视基地",
+  "appid": "movie_996",
+  "version": "0.1.13",
+  "appUrlConfig": "https://raw.githubusercontent.com/htyf-mp-community/movie/main/dgz/build/outputs/app.json",
+  "zipUrl": "https://raw.githubusercontent.com/htyf-mp-community/movie/main/dgz/build/outputs/dist.dgz"
+}

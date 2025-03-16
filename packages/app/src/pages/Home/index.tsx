@@ -27,7 +27,7 @@ function Home() {
           let data = await jssdk?.puppeteer({
             url: `${host}`,
             jscode: `${jsCrawler}`,
-            debug: isDebug,
+            debug: false,
             wait: 2000,
             timeout: 1000 * 10,
             callback: () => {},
