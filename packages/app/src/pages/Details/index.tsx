@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import tw from 'twrnc';
-import { setDBVideoSources, setHistoryData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
+import { setDBData, setHistoryData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
 import jssdk from '@htyf-mp/js-sdk';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Appbar, MD2Colors } from 'react-native-paper';
@@ -9,98 +9,96 @@ import lodash from 'lodash'
 import URLParse from 'url-parse';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TVideo, TVideoSourcesItem } from '@/services';
+import { TVideo } from '@/services';
 import type { RootStackParamList } from '..';
+import type { HistoryItem } from '@/_UIHOOKS_/store/slices/appsSlice';
 
-function App() {
+// 详情项接口
+interface DetailItem {
+  label: string;
+  value: string[];
+}
+
+// 视频播放器配置接口
+interface VideoPlayerConfig {
+  url: string;
+  title: string;
+  headers?: Record<string, string>;
+  onPlayEnd?: () => void;
+  onPlayError?: () => void;
+}
+
+/**
+ * 详情页面组件
+ * 显示电影详情、播放列表和播放功能
+ */
+function Details() {
   const router = useRoute();
   const params = router.params as RootStackParamList['Details'];
   const url = decodeURIComponent(`${params?.url}`);
   const ui = useUI();
   const {bottom} = useSafeAreaInsets();
-  const bottomSheetRef = useRef(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const apps = useAppSelector(i => i.apps);
   const isDebug = apps?.__ENV__ === 'DEV';
   const db = useAppSelector(i => i.apps?.db || {});
-  const dbVideoSources = useAppSelector(i => i.apps?.dbVideoSources?.[url] || {});
   const [refreshing, setRefreshing] = useState(false);
   const [playLoading, setPlayLoading] = useState(false);
-
 
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
   const movieDetail = useMemo(() => {
     const urlObj = URLParse(url, true);
     const pathname = urlObj.pathname;
-    return lodash.get(db, `${pathname}`, undefined);
-  }, [db, url]) as TVideo;
-
-  const playList = useMemo(() => {
-    const list = lodash.cloneDeep(dbVideoSources?.['source'] || [])?.reverse()
-    return list;
-  }, [dbVideoSources])
+    return lodash.get(db, `${pathname}`, undefined) as TVideo;
+  }, [db, url])
 
   const historyInfo = useMemo(() => {
-    return lodash.get(apps?.history, `${url}`, undefined);
+    return lodash.get(apps?.history, `${url}`, undefined) as HistoryItem | undefined;
   }, [apps?.history, url]);
 
   const getData = useCallback(async () => {
-    return new Promise(async resolve => {
-      if (!url) {
-        return;
-      }
-      if (jssdk) {
-        setRefreshing(true)
-        try {
-          const data = await ui.getVideoSources(url);
-          resolve(data);
-          dispatch(
-            setDBVideoSources({
-              href: url,
-              videoSources: data,
-            }),
-          );
-        } catch (error) {
-          
-        } finally {
-          setRefreshing(false)
-        }
-      }
-    });
-  }, [params, isDebug]);
+    if (!url || !jssdk) return;
 
-  const getPlayUrl = useCallback(async (url: string, hasPlay: boolean = false): Promise<any> => {
-    return new Promise(async (resolve) => {
-      if (!url) {
-        resolve('')
-        return;
-      }
-      if (jssdk) { 
-        setPlayLoading(true)
-        try {
-          const data = await ui.getVideoUrl(url);
-          console.error(data);
-          jssdk.openVideoPlayer({
-            url: data.url,
-            title: movieDetail.title,
-            headers: data.headers,
-            onPlayEnd: () => {
-              
-            },
-            onPlayError: () => {
+    setRefreshing(true);
+    try {
+      const data = await ui.getVideoSources(url);
+      dispatch(
+        setDBData(data),
+      );
+    } catch (error) {
+      console.error('获取视频源失败:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [url]);
 
-            }
-          })
-        } catch (error) {
-          
-        } finally {
-          setPlayLoading(false)
-        }
-      }
-    })
-  }, [movieDetail, isDebug])
+  const getPlayUrl = useCallback(async (url: string, hasPlay: boolean = false): Promise<void> => {
+    if (!url || !jssdk) return;
+    setPlayLoading(true);
+    try {
+      const data = await ui.getVideoUrl(url);
+      // Alert.alert(JSON.stringify(data));
+      const playerConfig: VideoPlayerConfig = {
+        url: data.url,
+        title: movieDetail.title,
+        headers: data.headers,
+        onPlayEnd: () => {
+          console.log('播放结束');
+        },
+        onPlayError: () => {
+          console.error('播放出错');
+        },
+      };
+      jssdk.openVideoPlayer(playerConfig);
+    } catch (error) {
+      console.error('获取播放地址失败:', error);
+    } finally {
+      setPlayLoading(false);
+    }
+  }, [movieDetail]);
 
   const handleOpenBottomSheet = useCallback(() => {
     bottomSheetRef.current?.expand();
@@ -120,73 +118,79 @@ function App() {
     []
   );
 
-  const renderDetailItem = ({ item }) => (
+  const renderDetailItem = useCallback(({ item }: { item: DetailItem }) => (
     <View style={styles.detailItem}>
       <Text style={styles.detailLabel}>{item.label}</Text>
       <Text style={styles.detailValue}>{item.value.join(', ')}</Text>
     </View>
-  );
+  ), []);
 
-  const renderPlayItem = ({ item }: {item: TVideoSourcesItem }) => {
-    const itemUrlObj = new URLParse(`${item.href}`);
+  const detailItems = useMemo(() => {
+    if (!movieDetail?.details) return [];
+    
+    return [
+      { label: '类型', value: [movieDetail.details.type] },
+      { label: '地区', value: [movieDetail.details.region] },
+      { label: '年份', value: [movieDetail.details.year] },
+      { label: '别名', value: movieDetail.details.alias },
+      { label: '上映日期', value: [movieDetail.details.releaseDate] },
+      { label: '导演', value: movieDetail.details.director },
+      { label: '编剧', value: movieDetail.details.writer },
+      { label: '主演', value: movieDetail.details.actors },
+      { label: '语言', value: [movieDetail.details.language] }
+    ].filter(item => item.value.length > 0 && item.value[0] !== '');
+  }, [movieDetail]);
+
+  const renderPlayItem = useCallback(({ item }: { item: TVideo['playList'][0] }) => {
+    const itemUrlObj = new URLParse(`${item.url}`);
     const hisUrlObj = new URLParse(`${historyInfo?.playUrl}`);
     const hisBtn = itemUrlObj.pathname === hisUrlObj.pathname;
     const loading = hisBtn && playLoading;
+
     return (
-      <TouchableOpacity 
-      style={[
-        styles.playItem,
-        tw`gap-[8px]`,
-        hisBtn ? tw`bg-red-300` : undefined
-      ]} 
-      disabled={loading}
-      onPress={() => {
-        dispatch(
-          setHistoryData({
-            url: url,
-            playUrl: item.href,
-            time: Date.now(),
-          }),
-        );
-        getPlayUrl(item.href, true)
-      }}>
-        <Text style={styles.playText}>{item.ep}</Text>
-        {
-          loading ? 
-          <View
-            style={tw`justify-center items-center gap-[8px] flex-row`}
-          >
+      <TouchableOpacity
+        style={[
+          styles.playItem,
+          tw`gap-[8px]`,
+          hisBtn ? tw`bg-red-300` : undefined,
+        ]}
+        disabled={loading}
+        onPress={() => {
+          dispatch(
+            setHistoryData({
+              url: url,
+              playUrl: item.url,
+              time: Date.now(),
+            }),
+          );
+          getPlayUrl(item.url, true);
+        }}
+      >
+        <Text style={styles.playText}>{item.title}</Text>
+        {loading && (
+          <View style={tw`justify-center items-center gap-[8px] flex-row`}>
             <ActivityIndicator animating={true} color={MD2Colors.red800} />
             <Text style={tw`text-[${MD2Colors.red800}]`}>加载视频中...</Text>
           </View>
-          : undefined
-        }
+        )}
       </TouchableOpacity>
-    )
-  };
-
+    );
+  }, [historyInfo, playLoading, url, dispatch, getPlayUrl]);
 
   useEffect(() => {
     getData();
-  }, [])
+  }, [getData]);
 
   return <View style={{
     flex: 1,
     flexDirection: 'column'
   }}>
-    <Appbar.Header
-      mode="small"
-      style={{
-        height: 50
-      }}
-    >
-      <Appbar.BackAction onPress={() => {
-        navigation.goBack();
-      }} />
-      <Appbar.Content titleStyle={{fontSize: 18,}} title={params?.name} />
+    <Appbar.Header mode="small" style={tw`h-[50px]`}>
+      <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.Content titleStyle={tw`text-[18px]`} title={params?.name || '详情'} />
     </Appbar.Header>
     <View style={tw`flex-1`}>
-      <View style={tw`h-0 flex-grow`}>
+      <View style={tw`h-0 flex-1`}>
         <ScrollView style={tw`flex-grow`}
           refreshControl={
             <RefreshControl
@@ -201,24 +205,24 @@ function App() {
         >
           <View style={tw`p-[16px]`}>
             {/* 封面图和标题 */}
-            <Image source={{ uri: movieDetail?.img }} style={styles.movieImage} />
+            <Image source={{ uri: movieDetail?.cover }} style={styles.movieImage} />
             <Text style={styles.movieTitle}>{movieDetail?.title}</Text>
 
-            {/* 评分 */}
-            <Text style={styles.rating}>评分: {movieDetail?.rating}</Text>
+            {/* 年份 */}
+            <Text style={styles.rating}>{movieDetail?.year || ''}</Text>
             {
               jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
             }
             {/* 详细信息 */}
             <FlatList
-              data={movieDetail?.moviedteail_list}
+              data={detailItems}
               renderItem={renderDetailItem}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_, index) => index.toString()}
               contentContainerStyle={styles.detailList}
             />
 
             {/* 电影简介 */}
-            <Text style={styles.context}>{movieDetail?.yp_context}</Text>
+            <Text style={styles.context}>{movieDetail?.description}</Text>
           </View>
         </ScrollView>
       </View>
@@ -244,16 +248,16 @@ function App() {
       ]}>
         <Text style={styles.sheetHeader}>播放列表：</Text>
         <FlatList
-          data={playList}
+          data={movieDetail?.playList || []}
           renderItem={renderPlayItem}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(_, index) => index.toString()}
         />
       </View>
     </BottomSheet>
   </View>;
 }
 
-export default App;
+export default Details;
 
 const styles = StyleSheet.create({
   container: {

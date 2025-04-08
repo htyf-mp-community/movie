@@ -9,8 +9,10 @@ import lodash from 'lodash';
 import Item from '@/components/item';
 import { useNavigation } from '@react-navigation/native';
 import { Appbar } from 'react-native-paper';
+import type { TVideo } from '@/services';
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-
+// 电影分类枚举
 enum TypeEnum {
   'movie_bt' = '全部',
   'dbtop250' = '豆瓣电影Top250',
@@ -23,195 +25,280 @@ enum TypeEnum {
   'fanju' = '番剧',
 }
 
-const MovieListPage = () => {
-  const flatListRef = useRef<FlatList>(null);
+// 电影列表项接口
+interface MovieItem {
+  url: string;
+  name: string;
+  img?: string;
+  [key: string]: any;
+}
+
+// 数据对象接口
+interface DataObject {
+  [key: string]: {
+    items: MovieItem[];
+    [key: string]: any;
+  };
+}
+
+// 分页信息接口
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+// 请求配置接口
+interface RequestConfig {
+  url: string;
+  jscode: string;
+  debug: boolean;
+  wait: number;
+  timeout: number;
+  callback: () => void;
+}
+
+/**
+ * 电影列表页面组件
+ * 显示不同分类的电影列表，支持下拉刷新和上拉加载更多
+ */
+const MovieListPage: React.FC = () => {
+  // 引用和状态
+  const flatListRef = useRef<FlatList<MovieItem>>(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const apps = useAppSelector(i => i.apps);
+  const apps = useAppSelector((state) => state.apps);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [selectedTab, setSelectedTab] = useState('全部');
   const [searchword, setSearchword] = useState<keyof typeof TypeEnum>('movie_bt');
-  const [dataObj, setDataObj] = useImmer<{ [key: string]: any[] }>({});
+  const [dataObj, setDataObj] = useImmer<DataObject>({});
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+    hasMore: true,
+  });
   
   const isDebug = apps?.__ENV__ === 'DEV';
 
-  const tabs = ['全部', '动作', '喜剧', '科幻'];
+  /**
+   * 构建请求URL
+   * @param type - 分类类型
+   * @param page - 页码
+   * @returns 完整的请求URL
+   */
+  const buildRequestUrl = useCallback((type: keyof typeof TypeEnum, page: number): string => {
+    const baseUrl = type === 'movie_bt' 
+      ? `${host}movie_bt/movie_bt_series/dyy`
+      : `${host}${type}`;
+    
+    return page <= 1 ? baseUrl : `${baseUrl}/page/${page}`;
+  }, []);
 
+  /**
+   * 构建请求配置
+   * @param url - 请求URL
+   * @returns 请求配置对象
+   */
+  const buildRequestConfig = useCallback((url: string): RequestConfig => ({
+    url,
+    jscode: `${jsCrawler}`,
+    debug: isDebug,
+    wait: 2000,
+    timeout: 1000 * 30,
+    callback: () => {},
+  }), [isDebug]);
+
+  /**
+   * 获取电影列表数据
+   * @param page - 页码
+   * @param type - 分类类型
+   */
   const getData = useCallback(
     async (page: number = 1, type: keyof typeof TypeEnum = 'movie_bt') => {
-      return new Promise(async resolve => {
-        if (page <= 1 && flatListRef.current) {
-          setIsRefreshing(true);
-          flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-        }
-        try {
-          let url =
-          page <= 1
-            ? `${host}movie_bt/movie_bt_series/dyy`
-            : `${host}movie_bt/movie_bt_series/dyy/page/${page}`;
-          if (type === 'movie_bt') {
-            url =
-              page <= 1
-                ? `${host}movie_bt/movie_bt_series/dyy`
-                : `${host}movie_bt/movie_bt_series/dyy/page/${page}`;
-          }
-          if (type === 'dbtop250') {
-            url = page <= 1 ? `${host}dbtop250` : `${host}dbtop250/page/${page}`;
-          }
-          if (type === 'zuixindianying') {
-            url = page <= 1 ? `${host}zuixindianying` : `${host}zuixindianying/page/${page}`;
-          }
-          if (type === 'dongmanjuchangban') {
-            url = page <= 1 ? `${host}dongmanjuchangban` : `${host}dongmanjuchangban/page/${page}`;
-          }
-          if (type === 'benyueremen') {
-            url = page <= 1 ? `${host}benyueremen` : `${host}benyueremen/page/${page}`;
-          }
-          if (type === 'gcj') {
-            url = page <= 1 ? `${host}gcj` : `${host}gcj/page/${page}`;
-          }
-          if (type === 'meijutt') {
-            url = page <= 1 ? `${host}meijutt` : `${host}meijutt/page/${page}`;
-          }
-          if (type === 'hanjutv') {
-            url = page <= 1 ? `${host}hanjutv` : `${host}hanjutv/page/${page}`;
-          }
-          if (type === 'fanju') {
-            url = page <= 1 ? `${host}fanju` : `${host}fanju/page/${page}`;
-          }
-          if (jssdk) {
-            const data = await jssdk?.puppeteer({
-              url: url,
-              jscode: `${jsCrawler}`,
-              debug: true,
-              wait: 2000,
-              timeout: 1000 * 30,
-              callback: () => {},
+      if (page <= 1 && flatListRef.current) {
+        setIsRefreshing(true);
+        flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+      }
+
+      try {
+        const url = buildRequestUrl(type, page);
+        const config = buildRequestConfig(url);
+
+        if (jssdk) {
+          const data = await jssdk.puppeteer(config);
+
+          if (data?.items?.length) {
+            dispatch(setDBData(data.items));
+            setDataObj((draft) => {
+              if (page === 1) {
+                return { 1: data };
+              }
+              draft[page] = data;
+              return draft;
             });
-            resolve(data);
-            if (data?.items?.length) {
-              dispatch(setDBData(data?.items));
-              setDataObj(_dataObj => {
-                if (page === 1) {
-                  return {
-                    1: data,
-                  };
-                }
-                _dataObj[page] = data;
-                return _dataObj;
-              });
-            }
+
+            // 更新分页信息
+            setPagination(prev => ({
+              ...prev,
+              currentPage: page,
+              hasMore: data.items.length > 0,
+            }));
           }
-        } catch (error) {
-          
-        } finally {
-          setIsRefreshing(false);
         }
-      });
+      } catch (error) {
+        console.error('获取电影列表失败:', error);
+      } finally {
+        setIsRefreshing(false);
+      }
     },
-    [],
+    [dispatch, setDataObj, buildRequestUrl, buildRequestConfig],
   );
 
-  // 下拉刷新
+  /**
+   * 处理下拉刷新
+   */
   const handleRefresh = useCallback(async () => {
     try {
       setIsRefreshing(true);
       await getData(1, searchword);
     } catch (error) {
-      
+      console.error('刷新失败:', error);
     } finally {
       setIsRefreshing(false);
     }
- 
-  }, [dataObj, searchword]);
+  }, [getData, searchword]);
 
-  const nextPage = useMemo(() => {
-    return (Object.keys(dataObj || {})?.length || 0) + 1;
-  }, [dataObj])
-
-  // 上拉加载更多
+  /**
+   * 处理上拉加载更多
+   */
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || !pagination.hasMore) return;
     try {
       setIsLoadingMore(true);
-      const nextPage = (Object.keys(dataObj || {})?.length || 1) + 1;
-      await getData(nextPage, searchword);
+      await getData(pagination.currentPage + 1, searchword);
     } catch (error) {
-      
+      console.error('加载更多失败:', error);
     } finally {
       setIsLoadingMore(false);
     }
-    
-  }, [isLoadingMore, dataObj, searchword]);
+  }, [isLoadingMore, getData, searchword, pagination]);
 
+  /**
+   * 合并所有页面的电影列表
+   */
   const list = useMemo(() => {
-    const _list: Array<BookItem> = [];
+    const _list: MovieItem[] = [];
     for (const key in dataObj) {
-      const items: any = lodash.get(dataObj, `[${key}]['items']`, []);
+      const items = lodash.get(dataObj, `[${key}]['items']`, []) as MovieItem[];
       _list.push(...items);
     }
     return _list;
   }, [dataObj]);
 
+  /**
+   * 处理分类切换
+   * @param key - 分类键
+   * @param label - 分类标签
+   */
+  const handleTabPress = useCallback((key: keyof typeof TypeEnum, label: string) => {
+    setSelectedTab(label);
+    setSearchword(key);
+    setDataObj({}); // 清空数据
+    setPagination({
+      currentPage: 1,
+      totalPages: 1,
+      hasMore: true,
+    });
+  }, [setDataObj]);
+
+  /**
+   * 处理电影项点击
+   * @param info - 电影信息
+   */
+  const handleMoviePress = useCallback((info: TVideo) => {
+    navigation.navigate('Details', {
+      name: info.title,
+      url: encodeURIComponent(info.href),
+    });
+  }, [navigation]);
+
+  // 初始化加载数据
   useEffect(() => {
     getData(1, searchword);
-  }, [searchword]);
+  }, [getData, searchword]);
 
-  // 渲染 tabs
-  const renderTabs = () => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScrollContainer}>
+  /**
+   * 渲染分类标签
+   */
+  const renderTabs = useCallback(() => (
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false} 
+      contentContainerStyle={styles.tabsScrollContainer}
+    >
       {Object.entries(TypeEnum).map(([key, label]) => (
-        <TouchableOpacity key={key} style={styles.tabItem} onPress={() => {
-          setSelectedTab(label);
-          setSearchword(key);
-        }}>
-          <Text style={[styles.tabText, selectedTab === label && styles.selectedTab]}>{label}</Text>
+        <TouchableOpacity 
+          key={key} 
+          style={[
+            styles.tabItem,
+            selectedTab === label && styles.selectedTabItem,
+          ]} 
+          onPress={() => handleTabPress(key as keyof typeof TypeEnum, label)}
+        >
+          <Text style={[
+            styles.tabText,
+            selectedTab === label && styles.selectedTabText,
+          ]}>
+            {label}
+          </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
-  );
+  ), [handleTabPress, selectedTab]);
+
+  /**
+   * 渲染加载状态
+   */
+  const renderLoading = useCallback(() => (
+    <View style={tw`h-[180px] justify-start items-center`}>
+      {isLoadingMore && pagination.currentPage > 1 && (
+        <ActivityIndicator size="large" color="#0000ff" />
+      )}
+    </View>
+  ), [isLoadingMore, pagination.currentPage]);
 
   return (
     <View style={styles.container}>
-      <Appbar.Header
-        mode="small"
-        style={{
-          height: 50
-        }}
-      >
-        <Appbar.Content titleStyle={{fontSize: 18,}} title="分类" />
+      <Appbar.Header mode="small" style={tw`h-[50px]`}>
+        <Appbar.Content titleStyle={tw`text-[18px]`} title="分类" />
       </Appbar.Header>
-      {/* Tabs */}
+
       <View style={tw`flex-grow`}>
-        <View>
-          {renderTabs()}
-        </View>
+        <View>{renderTabs()}</View>
         <View style={tw`flex-grow h-0`}>
-          {
-            jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
-          }
-          {/* 电影列表 */}
+          {jssdk.AdBanner && <jssdk.AdBanner />}
           <FlatList
             ref={flatListRef}
             data={list}
-            renderItem={({ item }: any) => {
-              return <Item url={item?.url} 
-                onPress={(info: any) => {
-                  navigation.navigate(`Details`, {
-                    name: info.name,
-                    url: encodeURIComponent(info.url)
-                  })
-                }}
+            renderItem={({ item }) => (
+              <Item 
+                url={item.url} 
+                onPress={handleMoviePress}
               />
-            }}
+            )}
             keyExtractor={(item) => item.url}
-            numColumns={2} // 设置两列
+            numColumns={2}
             contentContainerStyle={styles.movieList}
-            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-            onEndReached={handleLoadMore} // 触发加载更多
-            onEndReachedThreshold={0.1} // 距底部多远触发加载更多
-            ListFooterComponent={() => <View style={tw`h-[180px] justify-start items-center`}>{(isLoadingMore && nextPage > 1) && <ActivityIndicator size="large" color="#0000ff" />}</View>}
+            refreshControl={
+              <RefreshControl 
+                refreshing={isRefreshing} 
+                onRefresh={handleRefresh} 
+              />
+            }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={renderLoading}
           />
         </View>
       </View>
@@ -228,30 +315,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
   },
-  movieItem: {
-    flex: 1,
-    margin: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    padding: 10,
-  },
-  movieImage: {
-    width: 150,
-    height: 200,
-    borderRadius: 10,
-  },
-  movieTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-    textAlign: 'center',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+  tabsScrollContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
   tabItem: {
     justifyContent: 'center',
@@ -260,19 +326,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#e0e0e0',
   },
+  selectedTabItem: {
+    backgroundColor: '#007bff20',
+  },
   tabText: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     fontSize: 16,
     color: '#333',
   },
-  selectedTab: {
+  selectedTabText: {
     color: '#007bff',
     fontWeight: 'bold',
-  },
-  tabsScrollContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 5,
   },
 });
 

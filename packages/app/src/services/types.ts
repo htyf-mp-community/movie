@@ -1,13 +1,27 @@
 export type TVideosRec = { title: string, href: string, videos: TVideo[] }
 export type TVideo = {
-    title: string
-    href: string
-    img: string
-    status: string
+    href: string;
+    // 基本信息
+    title: string;
+    year: string;
+    cover: string;
+    // 详细信息
+    details: {
+        type: string;
+        region: string;
+        year: string;
+        alias: string[];
+        releaseDate: string;
+        director: string[];
+        writer: string[];
+        actors: string[];
+        language: string;
+    },
+    // 剧情简介
+    description: string;
+    // 播放列表
+    playList: { title: string, url: string }[];
 }
-export type TVideoWithSource = TVideo & { source: TVideoSources };
-export type TVideoSourcesItem = { href: string, ep: string };
-export type TVideoSources = Record<string, TVideoSourcesItem[]>
 export type TVideoPlay = { url: string, title: string, index: number, source: string, sourceEps: { href: string, ep: string }[] }
 export type TVideoURL = { url: string, headers: any }
 
@@ -34,7 +48,7 @@ export type TVideoProvider = {
      * 获取视频详情
      * @param path url to the video
      */
-    getVideoSources(path: string): Promise<TVideoSources>
+    getVideoSources(path: string): Promise<TVideo>
 
     /**
      * 获取播放地址
@@ -47,12 +61,5 @@ export type TVideoProvider = {
      * @param keyword video search keyword
      */
     getVideoSearchResult(keyword: string, page?: number): Promise<{page: number, list: TVideo[]}>
-
-    /**
-     * Called when favourite videos are loaded from local storage
-     * to ensure videos status are up to date
-     * @param video favourite video stored in local
-     */
-    updateVideoStatus(video: TVideo): Promise<TVideo>
 }
 export type TProviderServices = Record<string, TVideoProvider>
