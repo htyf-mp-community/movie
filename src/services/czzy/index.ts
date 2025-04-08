@@ -109,7 +109,7 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
     }
   };
   // 第一次尝试，debug=true
-  const firstAttempt = await tryAuth(false);
+  const firstAttempt = await tryAuth(true);
   
   // 如果第一次失败，等待一段时间后再次尝试
   if (!firstAttempt) {
