@@ -75,7 +75,18 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
         url,
         jscode: `function(callback) {
           try {
+            
             const isDebug = Boolean(${debug ? 'true' : 'false'})
+            
+            // 检查是否已存在样式标签
+            const existingStyle = document.querySelector('style[data-custom-background]');
+            if (!existingStyle) {
+              const style = document.createElement('style');
+              style.setAttribute('data-custom-background', '');
+              style.textContent = 'body.custom-background { opacity: 0; }';
+              document.head.appendChild(style);
+            }
+            
             document.body.style.opacity = isDebug ? '1' : '0'
             const isCloudflare = /Cloudflare/gi.test(document.body.innerHTML)
             if (isCloudflare) {
