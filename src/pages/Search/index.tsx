@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl, Alert } from 'react-native';
 import tw from 'twrnc';
 import lodash from 'lodash';
 import { setDBData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
@@ -52,7 +52,7 @@ export async function getSearch(
     debug: false,
     wait: 2000,
     timeout: 1000 * 10,
-    callback: () => {},
+    callback: () => { },
     ...opt,
   });
   return data;
@@ -85,7 +85,7 @@ const MovieSearchPage: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const apps = useAppSelector(i => i.apps);
-  
+
   // 状态管理
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -117,27 +117,47 @@ const MovieSearchPage: React.FC = () => {
       try {
         if (jssdk) {
           setLoading(true);
-          if (isFirstSearch) {
-            isFirstSearch = false;
-            // await auth();
-          }
           const data = await ui.getVideoSearchResult(searchword, page);
-          
           if (data?.list) {
-            dispatch(setDBData(data.list));
+            // 将 VideoItem 转换为 TVideo 格式
+            const videoList = data.list.map(item => ({
+              href: item.link,
+              img: item.image,
+              title: item.title,
+              status: item.actors,
+              // 添加其他必要字段
+              year: '',
+              cover: item.image,
+              details: {
+                type: '',
+                region: '',
+                year: '',
+                alias: [],
+                releaseDate: '',
+                director: [],
+                writer: [],
+                actors: item.actors.split(',').map(actor => actor.trim()),
+                language: ''
+              },
+              description: '',
+              playList: []
+            }));
+            
+            dispatch(setDBData(videoList));
             setDataObj(_dataObj => {
               if (page === 1) {
-                return { 1: data.list };
+                return { 1: videoList };
               }
-              _dataObj[page] = data.list;
+              _dataObj[page] = videoList;
               return _dataObj;
             });
 
             // 更新分页信息
             setPagination(prev => ({
               ...prev,
-              currentPage: page,
-              hasMore: data.list.length > 0,
+              currentPage: data.pagination.currentPage,
+              totalPages: data.pagination.totalPages,
+              hasMore: data.pagination.currentPage < data.pagination.totalPages,
             }));
           }
         }
@@ -235,8 +255,8 @@ const MovieSearchPage: React.FC = () => {
         ref={flatListRef}
         data={list}
         renderItem={({ item }) => (
-          <Item 
-            url={item.url} 
+          <Item
+            url={item.url}
             onPress={handleMoviePress}
           />
         )}
@@ -244,9 +264,9 @@ const MovieSearchPage: React.FC = () => {
         numColumns={2}
         contentContainerStyle={styles.movieList}
         refreshControl={
-          <RefreshControl 
-            refreshing={isRefreshing} 
-            onRefresh={handleRefresh} 
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
           />
         }
         onEndReached={handleLoadMore}

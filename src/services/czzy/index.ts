@@ -1,8 +1,10 @@
 import URLParse from 'url-parse';
 import jssdk from '@htyf-mp/js-sdk';
 import type { TVideoProvider, TVideo, TVideoURL } from '../types';
-import jsCrawler, { host } from './index.umd.string';
+import jsCrawler from './index.umd.string';
 import { Alert } from 'react-native';
+
+const host = "https://www.czzy77.com/"
 
 // 视频项接口
 interface VideoItem {
@@ -142,29 +144,84 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
 export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = async (
   keyword: string,
   page: number = 1
-): Promise<{ page: number; list: TVideo[] }> => {
+) => {
   try {
-    const url = `${host}daoyongjiek0shibushiyoubing?q=${encodeURIComponent(keyword)}&f=_all&p=${page}`;
+    const isAuth = await checkWebViewAuth();
+    if (!isAuth) {
+      throw new Error('WebView 未授权，无法获取首页数据');
+    }
+    const url = `${host}daoyongjiekoshibushiy0ubing?q=${encodeURIComponent(keyword)}&f=_all&p=${page}`;
     const data = await jssdk.puppeteer({
       url,
-      jscode: `${jsCrawler}`,
+      jscode: `function(callback) {
+        try {
+          function getMovieList() {
+            const movieList = [];
+            const movieItems = document.querySelectorAll('.search_list li');
+
+            movieItems.forEach(item => {
+              const movie = {
+                title: item.querySelector('.dytit a').textContent,
+                link: item.querySelector('.dytit a').href,
+                image: item.querySelector('img').src,
+                actors: item.querySelector('.inzhuy').textContent.replace('主演：', '')
+              };
+              movieList.push(movie);
+            });
+
+            return movieList;
+          }
+
+          // 获取分页信息
+          function getPaginationInfo() {
+            const pagination = {
+              currentPage: 1,
+              totalPages: 0,
+              pages: []
+            };
+
+            const paginationLinks = document.querySelectorAll('.pagenavi_txt a');
+
+            paginationLinks.forEach(link => {
+              if (link.classList.contains('current')) {
+                pagination.currentPage = parseInt(link.textContent);
+              } else {
+                const pageNum = parseInt(link.textContent);
+                pagination.pages.push({
+                  number: pageNum,
+                  url: link.href
+                });
+              }
+            });
+
+            // 获取总页数
+            pagination.totalPages = Math.max(...pagination.pages.map(p => p.number), pagination.currentPage);
+
+            return pagination;
+          }
+
+          // 使用示例
+          const movies = getMovieList();
+          const pagination = getPaginationInfo();
+          if (movies.length) {
+            callback(undefined, {
+              pagination,
+              list: movies,
+            });
+          }
+        } catch (error) {
+          alert(error);
+          callback(error, undefined);
+        }
+      }`,
       debug: false,
       wait: 2000,
       timeout: 1000 * 10,
       callback: () => {},
     });
 
-    const list: TVideo[] = data?.items?.map((i: any) => ({
-      href: i.url,
-      img: i.img,
-      title: i.name,
-      status: '',
-    })) || [];
 
-    return {
-      page,
-      list,
-    };
+    return data;
   } catch (error) {
     console.error('搜索视频失败:', error);
     return {
@@ -285,35 +342,272 @@ export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async () => 
  * 获取视频分类列表
  * @returns 视频分类列表数据
  */
-export const getVideoCategory: TVideoProvider['getVideoCategory'] = getHomeVideoList;
+export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (url?: string) => {
+  try {
+    const isAuth = await checkWebViewAuth();
+    if (!isAuth) {
+      throw new Error('WebView 未授权，无法获取首页数据');
+    }
+    const data = await jssdk.puppeteer({
+      url: url || `${host}/movie_bt`,
+      jscode: `function(callback) {
+        try {
+          // 获取所有分类信息
+          function getCategories() {
+            // 初始化默认返回值
+            const defaultCategories = {
+              year: {
+                label: '年份',
+                items: [],
+                selected: null
+              },
+              tags: {
+                label: '影片类型',
+                items: [],
+                selected: null
+              },
+              series: {
+                label: '分类',
+                items: [],
+                selected: null
+              }
+            };
 
-/**
- * 获取分类下的更多视频
- * @param path - 分类路径
- * @param page - 页码
- * @returns 分类下的视频列表
- */
-export const getVideoCategoryMore: TVideoProvider['getVideoCategoryMore'] = async (
-  path: string,
-  page: number
-): Promise<HomeVideoList> => {
-  return {
-    href: path,
-    title: '',
-    videos: [],
-  };
+            try {
+              // 获取年份分类
+              const yearElements = document.querySelectorAll('#beautiful-taxonomy-filters-tax-movie_bt_year .catmi');
+              if (yearElements && yearElements.length > 0) {
+                yearElements.forEach(element => {
+                  try {
+                    const slug = element.getAttribute('slug') || '';
+                    const text = element.textContent || '';
+                    const isSelected = element.classList.contains('selected-att');
+                    const url = element.getAttribute('cat-url') || '';
+
+                    defaultCategories.year.items.push({
+                      slug,
+                      text,
+                      url
+                    });
+
+                    if (isSelected) {
+                      defaultCategories.year.selected = {
+                        slug,
+                        text,
+                        url
+                      };
+                    }
+                  } catch (e) {
+                    console.warn('处理年份分类项时出错:', e);
+                  }
+                });
+              }
+
+              // 获取影片类型分类
+              const tagsElements = document.querySelectorAll('#beautiful-taxonomy-filters-tax-movie_bt_tags .catmi');
+              if (tagsElements && tagsElements.length > 0) {
+                tagsElements.forEach(element => {
+                  try {
+                    const slug = element.getAttribute('slug') || '';
+                    const text = element.textContent || '';
+                    const isSelected = element.classList.contains('selected-att');
+                    const url = element.getAttribute('cat-url') || '';
+
+                    defaultCategories.tags.items.push({
+                      slug,
+                      text,
+                      url
+                    });
+
+                    if (isSelected) {
+                      defaultCategories.tags.selected = {
+                        slug,
+                        text,
+                        url
+                      };
+                    }
+                  } catch (e) {
+                    console.warn('处理影片类型分类项时出错:', e);
+                  }
+                });
+              }
+
+              // 获取分类
+              const seriesElements = document.querySelectorAll('#beautiful-taxonomy-filters-tax-movie_bt_series .catmi');
+              if (seriesElements && seriesElements.length > 0) {
+                seriesElements.forEach(element => {
+                  try {
+                    const slug = element.getAttribute('slug') || '';
+                    const text = element.textContent || '';
+                    const isSelected = element.classList.contains('selected-att');
+                    const url = element.getAttribute('cat-url') || '';
+
+                    defaultCategories.series.items.push({
+                      slug,
+                      text,
+                      url
+                    });
+
+                    if (isSelected) {
+                      defaultCategories.series.selected = {
+                        slug,
+                        text,
+                        url
+                      };
+                    }
+                  } catch (e) {
+                    console.warn('处理分类项时出错:', e);
+                  }
+                });
+              }
+
+              return defaultCategories;
+            } catch (error) {
+              console.error('获取分类信息时发生错误:', error);
+              return defaultCategories;
+            }
+          }
+
+          // 获取所有电影信息
+          function getMovieInfo() {
+              try {
+                  const movies = [];
+                  const movieElements = document.querySelectorAll('.bt_img.mi_ne_kd.mrb ul li');
+                  
+                  if (!movieElements || movieElements.length === 0) {
+                      console.warn('未找到电影列表元素');
+                      return movies;
+                  }
+                  
+                  movieElements.forEach(movie => {
+                      try {
+                          const titleElement = movie.querySelector('.dytit a');
+                          const ratingElement = movie.querySelector('.rating');
+                          const actorsElement = movie.querySelector('.inzhuy');
+                          const typeElement = movie.querySelector('.furk');
+                          const episodesElement = movie.querySelector('.jidi span');
+                          const imageElement = movie.querySelector('.thumb.lazy');
+                          
+                          const movieInfo = {
+                              title: titleElement?.textContent?.trim() || '未知标题',
+                              rating: ratingElement?.textContent?.trim() || '暂无评分',
+                              actors: actorsElement?.textContent?.replace('主演：', '')?.trim() || '未知演员',
+                              type: typeElement?.textContent?.trim() || '未知类型',
+                              episodes: episodesElement?.textContent?.trim() || '未知集数',
+                              url: titleElement?.href || '',
+                              image: imageElement?.getAttribute('data-original') || ''
+                          };
+                          
+                          // 只添加有效数据的电影
+                          if (movieInfo.title && movieInfo.url) {
+                              movies.push(movieInfo);
+                          }
+                      } catch (itemError) {
+                          console.error('处理单个电影项时出错:', itemError);
+                          // 继续处理下一个电影项
+                      }
+                  });
+                  
+                  return movies;
+              } catch (error) {
+                  console.error('获取电影信息时出错:', error);
+                  return [];
+              }
+          }
+
+          // 获取分页信息
+          function getPaginationInfo() {
+              try {
+                  const pagination = {
+                      currentPage: 1,
+                      totalPages: 1,
+                      pages: []
+                  };
+                  
+                  const paginationElement = document.querySelector('.pagenavi_txt');
+                  if (!paginationElement) {
+                      console.warn('未找到分页元素');
+                      return pagination;
+                  }
+                  
+                  const links = paginationElement.querySelectorAll('a');
+                  if (!links || links.length === 0) {
+                      console.warn('未找到分页链接');
+                      return pagination;
+                  }
+                  
+                  links.forEach(link => {
+                      try {
+                          const pageText = link.textContent?.trim();
+                          if (!pageText) return;
+                          
+                          const pageNum = parseInt(pageText);
+                          if (!isNaN(pageNum)) {
+                              const pageInfo = {
+                                  number: pageNum,
+                                  url: link.href || '',
+                                  isCurrent: link.classList.contains('current')
+                              };
+                              
+                              pagination.pages.push(pageInfo);
+                              
+                              if (pageInfo.isCurrent) {
+                                  pagination.currentPage = pageNum;
+                              }
+                          }
+                      } catch (linkError) {
+                          console.error('处理分页链接时出错:', linkError);
+                          // 继续处理下一个链接
+                      }
+                  });
+                  
+                  // 计算总页数
+                  if (pagination.pages.length > 0) {
+                      pagination.totalPages = Math.max(...pagination.pages.map(p => p.number));
+                  }
+                  
+                  return pagination;
+              } catch (error) {
+                  console.error('获取分页信息时出错:', error);
+                  return {
+                      currentPage: 1,
+                      totalPages: 1,
+                      pages: []
+                  };
+              }
+          }
+
+          // 使用示例
+          const movies = getMovieInfo();
+          const pagination = getPaginationInfo();
+          const categories = getCategories();
+          console.log('电影信息：', movies);
+          console.log('分页信息：', pagination);
+          if (movies.length) {
+            callback(undefined, {
+              categories,
+              pagination,
+              list: movies,
+            });
+          }
+        } catch (error) {
+          alert(error);
+          callback(error, undefined);
+        }
+      }`,
+      debug: false,
+      wait: 2000,
+      timeout: 1000 * 10,
+      callback: () => {},
+    });
+
+
+    return data;
+  } catch (error) {
+    console.error('搜索视频失败:', error);
+    throw error;
+  }
 };
-
-/**
- * 视频详情响应接口
- */
-interface VideoDetailResponse {
-  playList?: Array<{
-    url: string;
-    name: string;
-  }>;
-  [key: string]: any;
-}
 
 /**
  * 获取视频详情和播放源
@@ -396,19 +690,6 @@ interface VideoPlaybackInfo {
     host: string;
     cookie?: string;
   };
-}
-
-/**
- * 请求头接口
- */
-interface VideoHeaders {
-  Host?: string;
-  'user-agent'?: string;
-  Referer?: string;
-  Origin?: string;
-  Cookie?: string;
-  'Cache-Control'?: string;
-  Connection?: string;
 }
 
 /**
@@ -510,13 +791,14 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
 
     // 处理直接播放的情况
     if (!data.isIframe) {
-      return {
+      const videoInfo = {
         url: data.url,
         headers: {
           ...headers,
-          host: URLParse(data.url, true).host || '',
+          host: URLParse(host, true).host || '',
         },
-      };
+      }
+      return videoInfo;
     }
 
     // 处理 iframe 播放的情况
@@ -539,13 +821,14 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
     if (!iframeData?.url) {
       throw new Error('无法获取 iframe 中的视频播放地址');
     }
-    return {
+    const videoInfo = {
       url: iframeData.url,
       headers: {
         ...headers,
         'Host': URLParse(iframeData.url, true).host || '',
       },
     };
+    return videoInfo;
 
   } catch (error) {
     console.error('获取视频播放地址失败:', error);

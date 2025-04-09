@@ -37,7 +37,7 @@ function Details() {
   const params = router.params as RootStackParamList['Details'];
   const url = decodeURIComponent(`${params?.url}`);
   const ui = useUI();
-  const {bottom} = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -80,7 +80,8 @@ function Details() {
     setPlayLoading(true);
     try {
       const data = await ui.getVideoUrl(url);
-      // Alert.alert(JSON.stringify(data));
+      // Alert.alert(JSON.stringify(data.headers.Host));
+      // return
       const playerConfig: VideoPlayerConfig = {
         url: data.url,
         title: movieDetail.title,
@@ -127,7 +128,7 @@ function Details() {
 
   const detailItems = useMemo(() => {
     if (!movieDetail?.details) return [];
-    
+
     return [
       { label: '类型', value: [movieDetail.details.type] },
       { label: '地区', value: [movieDetail.details.region] },
