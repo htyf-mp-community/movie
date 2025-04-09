@@ -78,12 +78,12 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
             const isDebug = Boolean(${debug ? 'true' : 'false'})
             document.body.style.opacity = isDebug ? '1' : '0'
             const isCloudflare = /Cloudflare/gi.test(document.body.innerHTML)
-            
             if (isCloudflare) {
               console.log('检测到 Cloudflare 验证页面')
               if (!isDebug) {
-                Alert.alert('检测到 Cloudflare 验证页面')
                 callback(undefined, false)
+              } else {
+                // alert('检测到 Cloudflare 验证页面' + window.location.href)
               }
             }
             
@@ -109,12 +109,12 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
     }
   };
   // 第一次尝试，debug=true
-  const firstAttempt = await tryAuth(true);
+  const firstAttempt = await tryAuth(false);
   
   // 如果第一次失败，等待一段时间后再次尝试
   if (!firstAttempt) {
-    console.log('第一次授权检查失败，等待 1 秒后重试...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('第一次授权检查失败，等待 0.5 秒后重试...');
+    await new Promise(resolve => setTimeout(resolve, 500));
     return await tryAuth(true);
   }
   
