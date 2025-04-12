@@ -1,17 +1,14 @@
 import { setDBData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
-import jsCrawler, { host } from '@/utils/js-crawler';
 import tw from 'twrnc';
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView, Alert } from 'react-native';
-import jssdk from '@htyf-mp/js-sdk';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView, Alert, SafeAreaView } from 'react-native';
 import { useImmer } from 'use-immer';
 import lodash from 'lodash';
 import Item from '@/components/item';
 import { useNavigation } from '@react-navigation/native';
-import { Appbar } from 'react-native-paper';
 import type { TVideo } from '@/services';
-import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/categories';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 
 // 电影列表项接口
 interface MovieItem {
@@ -60,8 +57,9 @@ const MovieListPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<CategoryItem | null>(null);
   const [selectedTag, setSelectedTag] = useState<CategoryItem | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<CategoryItem | null>(null);
-
-  const isDebug = apps?.__ENV__ === 'DEV';
+  const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(true);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ['50%', '75%'], []);
 
   /**
    * 获取电影列表数据
@@ -181,17 +179,40 @@ const MovieListPage: React.FC = () => {
   /**
    * 处理分类切换
    */
-  const handleTabPress = useCallback((category: CategoryItem) => {
-    setSelectedTab(category.text);
-    setDataObj({}); // 清空数据
-    setPagination({
-      currentPage: 1,
-      totalPages: 1,
-      hasMore: true,
-    });
-    // 传入分类URL获取数据
-    getData(category.url);
-  }, [setDataObj, getData]);
+  const handleTabPress = useCallback((category: CategoryItem, type: 'year' | 'tag' | 'series') => {
+    // 检查是否是取消选中
+    const isDeselecting =
+      (type === 'year' && selectedYear?.slug === category.slug) ||
+      (type === 'tag' && selectedTag?.slug === category.slug) ||
+      (type === 'series' && selectedSeries?.slug === category.slug);
+
+    // 根据类型更新选中的分类
+    if (isDeselecting) {
+      if (type === 'year') setSelectedYear(null);
+      if (type === 'tag') setSelectedTag(null);
+      if (type === 'series') setSelectedSeries(null);
+    } else {
+      if (type === 'year') setSelectedYear(category);
+      if (type === 'tag') setSelectedTag(category);
+      if (type === 'series') setSelectedSeries(category);
+    }
+
+    // 获取当前选中的分类URL
+    const currentUrl = selectedYear?.url || selectedTag?.url || selectedSeries?.url;
+
+    // 如果取消选中后没有其他分类被选中，则重置为全部
+    if (!currentUrl && !isDeselecting) {
+      setDataObj({});
+      setPagination({
+        currentPage: 1,
+        totalPages: 1,
+        hasMore: true,
+      });
+      getData();
+    } else {
+      getData(currentUrl);
+    }
+  }, [selectedYear, selectedTag, selectedSeries, setDataObj, getData]);
 
   /**
    * 处理电影项点击
@@ -211,7 +232,7 @@ const MovieListPage: React.FC = () => {
   /**
    * 渲染分类标签组
    */
-  const renderCategoryGroup = useCallback((title: string, items: CategoryItem[], selectedItem: CategoryItem | null, onSelect: (item: CategoryItem) => void) => (
+  const renderCategoryGroup = useCallback((title: string, items: CategoryItem[], selectedItem: CategoryItem | null, onSelect: (item: CategoryItem, type: 'year' | 'tag' | 'series') => void, type: 'year' | 'tag' | 'series') => (
     <View style={styles.categoryGroup}>
       <Text style={styles.categoryTitle}>{title}</Text>
       <ScrollView
@@ -226,7 +247,7 @@ const MovieListPage: React.FC = () => {
               styles.tabItem,
               selectedItem?.slug === item.slug && styles.selectedTabItem,
             ]}
-            onPress={() => onSelect(item)}
+            onPress={() => onSelect(item, type)}
           >
             <Text style={[
               styles.tabText,
@@ -240,6 +261,20 @@ const MovieListPage: React.FC = () => {
     </View>
   ), []);
 
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        style={[props.style]}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+        pressBehavior="close"
+      />
+    ),
+    []
+  );
+
   /**
    * 渲染所有分类
    */
@@ -251,33 +286,80 @@ const MovieListPage: React.FC = () => {
             '年份',
             categories.year.items,
             selectedYear,
-            (item) => {
-              setSelectedYear(item);
-              handleTabPress(item);
-            }
+            handleTabPress,
+            'year'
           )}
           {renderCategoryGroup(
             '影片类型',
             categories.tags.items,
             selectedTag,
-            (item) => {
-              setSelectedTag(item);
-              handleTabPress(item);
-            }
+            handleTabPress,
+            'tag'
           )}
           {renderCategoryGroup(
             '分类',
             categories.series.items,
             selectedSeries,
-            (item) => {
-              setSelectedSeries(item);
-              handleTabPress(item);
-            }
+            handleTabPress,
+            'series'
           )}
         </>
       )}
     </View>
   ), [categories, selectedYear, selectedTag, selectedSeries, handleTabPress]);
+
+  /**
+   * 渲染选中的分类标签
+   */
+  const renderSelectedCategories = useCallback(() => (
+    <View style={styles.selectedCategoriesContainer}>
+      <TouchableOpacity
+        style={styles.expandButton}
+        onPress={() => bottomSheetRef.current?.expand()}
+      >
+        <Text style={styles.expandButtonText}>展开分类</Text>
+      </TouchableOpacity>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.selectedTagsScroll}
+      >
+        {selectedYear && (
+          <TouchableOpacity
+            style={styles.selectedTag}
+            onPress={() => handleTabPress(selectedYear, 'year')}
+          >
+            <Text style={styles.selectedTagText}>{selectedYear.text}</Text>
+          </TouchableOpacity>
+        )}
+        {selectedTag && (
+          <TouchableOpacity
+            style={styles.selectedTag}
+            onPress={() => handleTabPress(selectedTag, 'tag')}
+          >
+            <Text style={styles.selectedTagText}>{selectedTag.text}</Text>
+          </TouchableOpacity>
+        )}
+        {selectedSeries && (
+          <TouchableOpacity
+            style={styles.selectedTag}
+            onPress={() => handleTabPress(selectedSeries, 'series')}
+          >
+            <Text style={styles.selectedTagText}>{selectedSeries.text}</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    </View>
+  ), [selectedYear, selectedTag, selectedSeries, handleTabPress]);
+
+  /**
+   * 渲染列表头部
+   */
+  const renderListHeader = useCallback(() => (
+    <View>
+      {renderSelectedCategories()}
+    </View>
+  ), [renderSelectedCategories]);
 
   /**
    * 渲染加载状态
@@ -301,39 +383,55 @@ const MovieListPage: React.FC = () => {
   ), [handleMoviePress]);
 
   return (
-    <View style={styles.container}>
-      <Appbar.Header mode="small" style={[tw`h-[50px]`, { backgroundColor: 'transparent' }]}>
-        <Appbar.Content titleStyle={[tw`text-[18px]`, { color: '#fff' }]} title="分类" />
-      </Appbar.Header>
-
+    <SafeAreaView style={styles.container}>
+      {renderListHeader()}
       <View style={tw`flex-grow`}>
-        {renderCategories()}
-        <View style={tw`flex-grow h-0`}>
-          {jssdk.AdBanner && <jssdk.AdBanner />}
-          <FlatList
-            ref={flatListRef}
-            data={list}
-            renderItem={renderMovieItem}
-            keyExtractor={(item) => item.url}
-            numColumns={2}
-            contentContainerStyle={styles.movieList}
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={handleRefresh}
-                colors={['#E50914']}
-                tintColor="#E50914"
-                title="正在刷新..."
-                titleColor="#E50914"
-              />
-            }
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.1}
-            ListFooterComponent={renderLoading}
-          />
-        </View>
+        <FlatList
+          ref={flatListRef}
+          data={list}
+          renderItem={renderMovieItem}
+          keyExtractor={(item) => item.url}
+          numColumns={2}
+          contentContainerStyle={styles.movieList}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={['#E50914']}
+              tintColor="#E50914"
+              title="正在刷新..."
+              titleColor="#E50914"
+            />
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderLoading}
+        />
       </View>
-    </View>
+
+      <BottomSheet
+        backdropComponent={renderBackdrop}
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        backgroundStyle={styles.bottomSheetBackground}
+        handleIndicatorStyle={styles.bottomSheetIndicator}
+      >
+        <View style={styles.bottomSheetContent}>
+          <View style={styles.bottomSheetHeader}>
+            <Text style={styles.bottomSheetTitle}>分类</Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => bottomSheetRef.current?.close()}
+            >
+              <Text style={styles.closeButtonText}>关闭</Text>
+            </TouchableOpacity>
+          </View>
+          {renderCategories()}
+        </View>
+      </BottomSheet>
+    </SafeAreaView>
   );
 };
 
@@ -381,6 +479,91 @@ const styles = StyleSheet.create({
   selectedTabText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  categoriesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  categoriesHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  collapseButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  collapseButtonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  selectedCategoriesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  expandButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginRight: 10,
+  },
+  expandButtonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  selectedTagsScroll: {
+    flex: 1,
+  },
+  selectedTag: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 10,
+  },
+  selectedTagText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  bottomSheetBackground: {
+    backgroundColor: '#1a1a1a',
+  },
+  bottomSheetIndicator: {
+    backgroundColor: '#fff',
+  },
+  bottomSheetContent: {
+    flex: 1,
+    paddingHorizontal: 15,
+  },
+  bottomSheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginBottom: 10,
+  },
+  bottomSheetTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  closeButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 14,
   },
 });
 
