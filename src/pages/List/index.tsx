@@ -80,19 +80,20 @@ const MovieListPage: React.FC = () => {
       try {
         const response = await ui.getVideoCategory(url);
         if (response) {
+          // 更新分类信息
           setCategories(response.categories);
+
+          // 更新数据
           setDataObj(draft => {
             if (!url) {
               // 刷新时清空数据
               draft[selectedTab] = {
                 items: response.list.map(movie => ({
-                  url: movie.url,
+                  url: movie.href,
                   name: movie.title,
-                  img: movie.image,
-                  rating: movie.rating,
-                  actors: movie.actors,
-                  type: movie.type,
-                  episodes: movie.episodes
+                  img: movie.cover,
+                  year: movie.year,
+                  details: movie.details
                 }))
               };
             } else {
@@ -102,18 +103,18 @@ const MovieListPage: React.FC = () => {
                 items: [
                   ...currentItems,
                   ...response.list.map(movie => ({
-                    url: movie.url,
+                    url: movie.href,
                     name: movie.title,
-                    img: movie.image,
-                    rating: movie.rating,
-                    actors: movie.actors,
-                    type: movie.type,
-                    episodes: movie.episodes
+                    img: movie.cover,
+                    year: movie.year,
+                    details: movie.details
                   }))
                 ]
               };
             }
           });
+
+          // 更新分页信息
           setPagination({
             currentPage: response.pagination.currentPage,
             totalPages: response.pagination.totalPages,
@@ -289,10 +290,20 @@ const MovieListPage: React.FC = () => {
     </View>
   ), [isLoadingMore, pagination.currentPage]);
 
+  const renderMovieItem = useCallback(({ item }: { item: MovieItem }) => (
+    <Item
+      url={item.url}
+      title={item.name}
+      year={item.year}
+      cover={item.img}
+      onPress={handleMoviePress}
+    />
+  ), [handleMoviePress]);
+
   return (
     <View style={styles.container}>
-      <Appbar.Header mode="small" style={tw`h-[50px]`}>
-        <Appbar.Content titleStyle={tw`text-[18px]`} title="分类" />
+      <Appbar.Header mode="small" style={[tw`h-[50px]`, { backgroundColor: 'transparent' }]}>
+        <Appbar.Content titleStyle={[tw`text-[18px]`, { color: '#fff' }]} title="分类" />
       </Appbar.Header>
 
       <View style={tw`flex-grow`}>
@@ -302,12 +313,7 @@ const MovieListPage: React.FC = () => {
           <FlatList
             ref={flatListRef}
             data={list}
-            renderItem={({ item }) => (
-              <Item
-                url={item.url}
-                onPress={handleMoviePress}
-              />
-            )}
+            renderItem={renderMovieItem}
             keyExtractor={(item) => item.url}
             numColumns={2}
             contentContainerStyle={styles.movieList}
@@ -315,6 +321,10 @@ const MovieListPage: React.FC = () => {
               <RefreshControl
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
+                colors={['#E50914']}
+                tintColor="#E50914"
+                title="正在刷新..."
+                titleColor="#E50914"
               />
             }
             onEndReached={handleLoadMore}
@@ -330,20 +340,20 @@ const MovieListPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   categoriesContainer: {
-    paddingVertical: 10,
+    paddingVertical: 15,
   },
   categoryGroup: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
   categoryTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
     paddingHorizontal: 15,
-    color: '#333',
+    color: '#fff',
   },
   movieList: {
     paddingHorizontal: 10,
@@ -355,21 +365,21 @@ const styles = StyleSheet.create({
   tabItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 6,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   selectedTabItem: {
-    backgroundColor: '#007bff20',
+    backgroundColor: '#E50914',
   },
   tabText: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    fontSize: 14,
-    color: '#333',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    color: '#fff',
   },
   selectedTabText: {
-    color: '#007bff',
+    color: '#fff',
     fontWeight: 'bold',
   },
 });

@@ -16,7 +16,7 @@ import type { HistoryItem } from '@/_UIHOOKS_/store/slices/appsSlice';
 // 详情项接口
 interface DetailItem {
   label: string;
-  value: string[];
+  value: string | string[];
 }
 
 // 视频播放器配置接口
@@ -64,10 +64,20 @@ function Details() {
 
     setRefreshing(true);
     try {
-      const data = await ui.getVideoSources(url);
-      dispatch(
-        setDBData(data),
-      );
+      const videoData = await ui.getVideoSources(url);
+      if (videoData) {
+        dispatch(setDBData(videoData));
+        // 如果视频有播放列表，自动记录第一个播放源到历史记录
+        if (videoData.playList && videoData.playList.length > 0) {
+          dispatch(
+            setHistoryData({
+              url: url,
+              playUrl: videoData.playList[0].url,
+              time: Date.now(),
+            }),
+          );
+        }
+      }
     } catch (error) {
       console.error('获取视频源失败:', error);
     } finally {
@@ -122,24 +132,33 @@ function Details() {
   const renderDetailItem = useCallback(({ item }: { item: DetailItem }) => (
     <View style={styles.detailItem}>
       <Text style={styles.detailLabel}>{item.label}</Text>
-      <Text style={styles.detailValue}>{item.value.join(', ')}</Text>
+      <Text style={styles.detailValue}>
+        {Array.isArray(item.value) ? item.value.join(', ') : item.value}
+      </Text>
     </View>
   ), []);
 
   const detailItems = useMemo(() => {
     if (!movieDetail?.details) return [];
 
-    return [
-      { label: '类型', value: [movieDetail.details.type] },
-      { label: '地区', value: [movieDetail.details.region] },
-      { label: '年份', value: [movieDetail.details.year] },
+    const items = [
+      { label: '类型', value: movieDetail.details.type },
+      { label: '地区', value: movieDetail.details.region },
+      { label: '年份', value: movieDetail.details.year },
       { label: '别名', value: movieDetail.details.alias },
-      { label: '上映日期', value: [movieDetail.details.releaseDate] },
+      { label: '上映日期', value: movieDetail.details.releaseDate },
       { label: '导演', value: movieDetail.details.director },
       { label: '编剧', value: movieDetail.details.writer },
       { label: '主演', value: movieDetail.details.actors },
-      { label: '语言', value: [movieDetail.details.language] }
-    ].filter(item => item.value.length > 0 && item.value[0] !== '');
+      { label: '语言', value: movieDetail.details.language }
+    ];
+
+    return items.filter(item => {
+      if (Array.isArray(item.value)) {
+        return item.value.length > 0 && item.value[0] !== '';
+      }
+      return item.value && item.value !== '';
+    });
   }, [movieDetail]);
 
   const renderPlayItem = useCallback(({ item }: { item: TVideo['playList'][0] }) => {
@@ -184,33 +203,38 @@ function Details() {
 
   return <View style={{
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    backgroundColor: '#000'
   }}>
-    <Appbar.Header mode="small" style={tw`h-[50px]`}>
-      <Appbar.BackAction onPress={() => navigation.goBack()} />
-      <Appbar.Content titleStyle={tw`text-[18px]`} title={params?.name || '详情'} />
+    <Appbar.Header mode="small" style={[tw`h-[50px]`, { backgroundColor: 'transparent' }]}>
+      <Appbar.BackAction onPress={() => navigation.goBack()} color="#fff" />
+      <Appbar.Content titleStyle={[tw`text-[18px]`, { color: '#fff' }]} title={params?.name || '详情'} />
     </Appbar.Header>
     <View style={tw`flex-1`}>
       <View style={tw`h-0 flex-1`}>
         <ScrollView style={tw`flex-grow`}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing} // 刷新状态
-              onRefresh={getData} // 下拉刷新时触发的函数
-              colors={['#ff0000']} // iOS & Android刷新图标的颜色
-              tintColor="#ff0000" // 仅限iOS
-              title="正在刷新..." // 仅限iOS
-              titleColor="#ff0000" // 仅限iOS
+              refreshing={refreshing}
+              onRefresh={getData}
+              colors={['#E50914']}
+              tintColor="#E50914"
+              title="正在刷新..."
+              titleColor="#E50914"
             />
           }
         >
           <View style={tw`p-[16px]`}>
             {/* 封面图和标题 */}
-            <Image source={{ uri: movieDetail?.cover }} style={styles.movieImage} />
-            <Text style={styles.movieTitle}>{movieDetail?.title}</Text>
+            <Image
+              source={{ uri: movieDetail?.cover }}
+              style={[styles.movieImage, { height: 500 }]}
+              resizeMode="cover"
+            />
+            <Text style={[styles.movieTitle, { color: '#fff' }]}>{movieDetail?.title}</Text>
 
             {/* 年份 */}
-            <Text style={styles.rating}>{movieDetail?.year || ''}</Text>
+            <Text style={[styles.rating, { color: '#808080' }]}>{movieDetail?.year || ''}</Text>
             {
               jssdk.AdBanner ? <jssdk.AdBanner /> : undefined
             }
@@ -223,14 +247,15 @@ function Details() {
             />
 
             {/* 电影简介 */}
-            <Text style={styles.context}>{movieDetail?.description}</Text>
+            <Text style={[styles.context, { color: '#fff' }]}>{movieDetail?.description}</Text>
           </View>
         </ScrollView>
       </View>
       {/* 底部播放按钮 */}
       <TouchableOpacity style={[
         styles.playButton,
-        tw`pb-[${bottom}px]`
+        tw`pb-[${bottom}px]`,
+        { backgroundColor: '#E50914' }
       ]} onPress={handleOpenBottomSheet}>
         <Text style={styles.playButtonText}>选择播放列表</Text>
       </TouchableOpacity>
@@ -240,14 +265,17 @@ function Details() {
       backdropComponent={renderBackdrop}
       enablePanDownToClose
       ref={bottomSheetRef}
-      index={-1}  // initial state is hidden
+      index={-1}
       snapPoints={snapPoints}
+      backgroundStyle={{ backgroundColor: '#141414' }}
+      handleIndicatorStyle={{ backgroundColor: '#808080' }}
     >
       <View style={[
         styles.bottomSheetContent,
-        tw`pb-[${bottom}px]`
+        tw`pb-[${bottom}px]`,
+        { backgroundColor: '#141414' }
       ]}>
-        <Text style={styles.sheetHeader}>播放列表：</Text>
+        <Text style={[styles.sheetHeader, { color: '#fff' }]}>播放列表：</Text>
         <FlatList
           data={movieDetail?.playList || []}
           renderItem={renderPlayItem}
@@ -263,15 +291,14 @@ export default Details;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 2,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   movieImage: {
     width: '100%',
-    height: 400,
     borderRadius: 10,
   },
   movieTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginVertical: 16,
     textAlign: 'center',
@@ -291,13 +318,14 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontWeight: 'bold',
+    color: '#808080',
   },
   detailValue: {
     flex: 1,
     textAlign: 'right',
+    color: '#fff',
   },
   playButton: {
-    backgroundColor: '#007bff',
     paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
@@ -316,19 +344,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sheetHeader: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   playItem: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
+    padding: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 8,
     marginVertical: 5,
   },
   playText: {
-    color: '#007bff',
+    color: '#fff',
     textAlign: 'center',
+    fontSize: 16,
   },
   context: {
     fontSize: 16,

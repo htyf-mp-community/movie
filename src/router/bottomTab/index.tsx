@@ -5,184 +5,180 @@ import Icon, { Icons } from './components/Icons';
 import Colors from './Colors';
 import * as Animatable from 'react-native-animatable';
 import { useTheme } from '@react-navigation/native';
-import {BlurView} from '@react-native-community/blur'
+import { BlurView } from '@react-native-community/blur'
 
 import * as routerConf from '@/pages';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const TabArr = [
-  { route: 'Tab_Home', label: '首页', type: Icons.Ionicons, icon: 'rocket', component: routerConf.Home },
-  { route: 'Tab_Course', label: '分类', type: Icons.Ionicons, icon: 'library', component: routerConf.List },
+interface TabItem {
+  route: string;
+  label: string;
+  type: keyof typeof Icons;
+  icon: string;
+  component: React.ComponentType<any>;
+}
+
+const TabArr: TabItem[] = [
+  { route: 'Tab_Home', label: '首页', type: 'Ionicons', icon: 'home', component: routerConf.Home },
+  { route: 'Tab_Course', label: '分类', type: 'Ionicons', icon: 'grid', component: routerConf.List },
 ];
 
 const Tab = createBottomTabNavigator();
 
-const animate1 = { 0: { scale: .5, translateY: 7 }, .92: { translateY: -34 }, 1: { scale: 1, translateY: -24 } }
-const animate2 = { 0: { scale: 1, translateY: -24 }, 1: { scale: 0.8, translateY: 7 } }
+interface CustomTabButtonProps extends Omit<BottomTabBarButtonProps, 'children'> {
+  item: TabItem;
+}
 
-const circle1 = { 0: { scale: 0 }, 0.3: { scale: .9 }, 0.5: { scale: .2 }, 0.8: { scale: .7 }, 1: { scale: 1 } }
-const circle2 = { 0: { scale: 1 }, 1: { scale: 0 } }
-
-const TabButton = (props: BottomTabBarButtonProps) => {
+const TabButton = (props: CustomTabButtonProps) => {
   const { item, onPress, accessibilityState } = props;
   const focused = accessibilityState?.selected;
-  const viewRef = useRef<any>(null);
-  const circleRef = useRef<any>(null);
-  const textRef = useRef<any>(null);
   const isDarkMode = useColorScheme() === 'dark';
-
-  const { colors } = useTheme()
-  // const color = isDarkMode ? Colors.white : Colors.black;
-  const color = Colors.black;
-  const bgColor = colors.background;
-
-  useEffect(() => {
-    if (focused) {
-      viewRef.current?.animate(animate1);
-      circleRef.current?.animate(circle1);
-      textRef.current?.transitionTo({ scale: 1 });
-    } else {
-      viewRef.current?.animate(animate2);
-      circleRef.current?.animate(circle2);
-      textRef.current?.transitionTo({ scale: 0 });
-    }
-  }, [focused])
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={1}
-      style={styles.container}>
-      <Animatable.View
-        ref={viewRef}
-        duration={600}
-        useNativeDriver
-        style={styles.container}>
-        <View style={[styles.btn, { borderColor: bgColor, backgroundColor: bgColor }]}>
-          <Animatable.View
-            ref={circleRef}
-            duration={600}
-            useNativeDriver
-            style={styles.circle} />
-          <Icon size={35} type={item.type} name={item.icon} color={focused ? Colors.white : Colors.primary} />
-        </View>
-        <Animatable.Text
-          ref={textRef}
-          duration={600}
-          useNativeDriver
-          style={[styles.text, { color }]}>
+      activeOpacity={0.7}
+      style={styles.tabButton}>
+      <View style={styles.tabButtonContent}>
+        <Icon
+          size={24}
+          type={Icons[item.type]}
+          name={item.icon}
+          color={focused ? '#E50914' : '#808080'}
+        />
+        <Text style={[
+          styles.tabLabel,
+          { color: focused ? '#E50914' : '#808080' }
+        ]}>
           {item.label}
-        </Animatable.Text>
-      </Animatable.View>
+        </Text>
+      </View>
+      {focused && <View style={styles.activeIndicator} />}
     </TouchableOpacity>
   )
 }
 
-export default function AnimTab1() {
+export default function NetflixTab() {
   const insets = useSafeAreaInsets()
   const size = useWindowDimensions()
-  const tabHeight = 70;
+  const tabHeight = 60;
+
   return (
     <Tab.Navigator
       initialRouteName='Tab_Home'
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarBackground: () => {
-          return <View style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: tabHeight,
-              borderRadius: 16,
-              overflow: 'hidden'
-          }}>
+        tabBarBackground: () => (
+          <View style={styles.tabBarBackground}>
             <BlurView
-              blurType="xlight"
+              blurType="dark"
+              blurAmount={20}
               style={StyleSheet.absoluteFillObject}
             />
           </View>
-        }
+        )
       }}
-      tabBar={(props) => {
-        return <View 
-          pointerEvents="box-none"
-          style={{
-            ...styles.tabBarWrap,
-            height: tabHeight,
-            bottom: Math.max(insets.bottom + 10, 40),
-          }}
+      tabBar={(props) => (
+        <View
+          style={[
+            styles.tabBarContainer,
+            {
+              height: tabHeight,
+              bottom: Math.max(insets.bottom, 0),
+            }
+          ]}
         >
-          <View style={{
-            height: tabHeight,
-            width: Math.min(size.width - 32, 400),
-          }}>
-            <BottomTabBar {...props} />
+          <View style={styles.tabBarContent}>
+            {props.state.routes.map((route, index) => {
+              const { options } = props.descriptors[route.key];
+              const isFocused = props.state.index === index;
+              const item = TabArr[index];
+
+              return (
+                <TabButton
+                  key={route.key}
+                  item={item}
+                  onPress={() => props.navigation.navigate(route.name)}
+                  accessibilityState={{ selected: isFocused }}
+                />
+              );
+            })}
           </View>
         </View>
-      }}
+      )}
     >
-      {TabArr.map((item, index) => {
-        return (
-          <Tab.Screen key={index} name={item.route} component={item.component}
-            options={{
-              tabBarShowLabel: false,
-              tabBarButton: (props) => <TabButton {...props} item={item} />
-            }}
-          />
-        )
-      })}
+      {TabArr.map((item, index) => (
+        <Tab.Screen
+          key={index}
+          name={item.route}
+          component={item.component}
+          options={{
+            tabBarShowLabel: true,
+          }}
+        />
+      ))}
     </Tab.Navigator>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 70,
-  },
-  tabBarWrap: {
+  tabBarContainer: {
     position: 'absolute',
     left: 0,
+    right: 0,
     bottom: 0,
-    width: '100%',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  tabBarContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  tabBarBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   tabBar: {
-    zIndex: 2,
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
+    elevation: 0,
+    height: 60,
+    position: 'absolute',
     bottom: 0,
     left: 0,
-    borderTopWidth: 0,
-    paddingHorizontal: 16,
-    backgroundColor: 'transparent'
+    right: 0,
   },
-  btn: {
-    width: 60,
+  tabButton: {
+    flex: 1,
     height: 60,
-    borderRadius: 99999,
-    borderWidth: 4,
-    borderColor: Colors.white,
-    backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden'
+    paddingVertical: 8,
   },
-  circle: {
-    ...StyleSheet.absoluteFillObject,
+  tabButtonContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary,
-    borderRadius: 25,
   },
-  text: {
-    marginTop: 5,
-    fontSize: 14,
-    textAlign: 'center',
-    color: Colors.primary,
-    fontWeight: '500'
-  }
+  tabLabel: {
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: 8,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E50914',
+  },
 })

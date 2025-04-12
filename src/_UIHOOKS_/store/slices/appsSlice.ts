@@ -3,17 +3,6 @@ import lodash from 'lodash';
 import URLParse from 'url-parse';
 import { TVideo, TVideoSources, TVService } from '@/services'
 
-enum ENV_ENUM {
-  'MASTER',
-  'QA',
-  'DEV'
-}
-
-enum HOST_ENUM {
-  'https://mini.xx.com/api',
-  'https://mini.xxx.com/api',
-}
-
 export interface PlayListItem {
   url: string;
   name: string;
@@ -53,8 +42,6 @@ export interface HistoryItem {
 
 // 初始状态类型
 export interface AppsState {
-  __ENV__: keyof typeof ENV_ENUM;
-  __HOST__: keyof typeof HOST_ENUM;
   token: string;
   source: keyof typeof TVService,
   db: {
@@ -64,7 +51,8 @@ export interface AppsState {
     [key: string]: TVideoSources
   },
   home: {
-    items: Array<string>
+    items: Array<string>;
+    videos?: TVideo[];
   },
   history: {
     [key: string]: HistoryItem
@@ -76,8 +64,6 @@ export interface AppsState {
 // 定义一个初始状态
 const initialState: AppsState = {
   source: '',
-  __ENV__: ENV_ENUM[ENV_ENUM['MASTER']],
-  __HOST__: HOST_ENUM[HOST_ENUM['https://mini.xx.com/api']],
   token: '',
   db: {},
   dbVideoSources: {},
@@ -90,8 +76,6 @@ const counterSlice = createSlice({
   initialState,
   reducers: {
     appStoreInit: (state) => {
-      state.__ENV__ = initialState.__ENV__;
-      state.__HOST__ = initialState.__HOST__;
       state.token = initialState.token;
       state.db = {};
       state.history = {};
@@ -100,18 +84,6 @@ const counterSlice = createSlice({
       };
     },
 
-    setEnv: (state, action: PayloadAction<AppsState['__ENV__']>) => {
-      if (ENV_ENUM[action.payload]) {
-        state.__ENV__ = action.payload;
-      } else {
-        state.__ENV__ = 'MASTER';
-      }
-      if (state.__ENV__ === 'MASTER') {
-        state.__HOST__ = 'https://mini.xx.com/api' 
-      } else {
-        state.__HOST__ = 'https://mini.xxx.com/api'
-      }
-    },
  
     setHomeData: (state, action: PayloadAction<AppsState['home']>) => {
       state.home = action.payload;

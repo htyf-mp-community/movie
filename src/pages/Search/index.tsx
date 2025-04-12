@@ -10,6 +10,7 @@ import jsCrawler, { host } from '@/utils/js-crawler';
 import { useNavigation } from '@react-navigation/native';
 import { Appbar } from 'react-native-paper';
 import type { TVideo } from '@/services';
+import Skeleton from '@/components/Skeleton';
 
 // 搜索请求参数接口
 interface SearchQuery {
@@ -30,9 +31,9 @@ interface DataObject {
 
 // 分页信息接口
 interface PaginationInfo {
-  currentPage: number;
-  totalPages: number;
-  hasMore: boolean;
+  currentPage: number;      // 当前页码
+  totalPages: number;       // 总页数
+  hasMore: boolean;         // 是否有更多数据
 }
 
 /**
@@ -87,11 +88,11 @@ const MovieSearchPage: React.FC = () => {
   const apps = useAppSelector(i => i.apps);
 
   // 状态管理
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [dataObj, setDataObj] = useImmer<DataObject>({});
-  const [searchword, setSearchword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [searchword, setSearchword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -119,36 +120,13 @@ const MovieSearchPage: React.FC = () => {
           setLoading(true);
           const data = await ui.getVideoSearchResult(searchword, page);
           if (data?.list) {
-            // 将 VideoItem 转换为 TVideo 格式
-            const videoList = data.list.map(item => ({
-              href: item.link,
-              img: item.image,
-              title: item.title,
-              status: item.actors,
-              // 添加其他必要字段
-              year: '',
-              cover: item.image,
-              details: {
-                type: '',
-                region: '',
-                year: '',
-                alias: [],
-                releaseDate: '',
-                director: [],
-                writer: [],
-                actors: item.actors.split(',').map(actor => actor.trim()),
-                language: ''
-              },
-              description: '',
-              playList: []
-            }));
-            
-            dispatch(setDBData(videoList));
+            // 直接使用返回的 TVideo 数据
+            dispatch(setDBData(data.list));
             setDataObj(_dataObj => {
               if (page === 1) {
-                return { 1: videoList };
+                return { 1: data.list };
               }
-              _dataObj[page] = videoList;
+              _dataObj[page] = data.list;
               return _dataObj;
             });
 
@@ -213,8 +191,8 @@ const MovieSearchPage: React.FC = () => {
    */
   const handleMoviePress = useCallback((info: TVideo) => {
     navigation.navigate('Details', {
-      name: info.name,
-      url: encodeURIComponent(info.url),
+      name: info.title,
+      url: encodeURIComponent(info.href),
     });
   }, [navigation]);
 
@@ -229,17 +207,27 @@ const MovieSearchPage: React.FC = () => {
     </View>
   ), [isLoadingMore, pagination.currentPage]);
 
+  const renderMovieItem = useCallback(({ item }: { item: TVideo }) => (
+    <Item
+      url={item.href}
+      title={item.title}
+      year={item.year}
+      cover={item.cover}
+      onPress={handleMoviePress}
+    />
+  ), [handleMoviePress]);
+
   return (
     <View style={styles.container}>
-      <Appbar.Header mode="small" style={tw`h-[50px]`}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content titleStyle={tw`text-[18px]`} title="搜索" />
+      <Appbar.Header mode="small" style={[tw`h-[50px]`, { backgroundColor: 'transparent' }]}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} color="#fff" />
+        <Appbar.Content titleStyle={[tw`text-[18px]`, { color: '#fff' }]} title="搜索" />
       </Appbar.Header>
 
       {/* 搜索框 */}
       <View style={styles.searchContainer}>
         <TextInput
-          placeholderTextColor="#333"
+          placeholderTextColor="#808080"
           style={styles.searchInput}
           placeholder="搜索电影..."
           value={searchword}
@@ -251,28 +239,29 @@ const MovieSearchPage: React.FC = () => {
       {jssdk.AdBanner && <jssdk.AdBanner />}
 
       {/* 电影列表 */}
-      <FlatList
-        ref={flatListRef}
-        data={list}
-        renderItem={({ item }) => (
-          <Item
-            url={item.url}
-            onPress={handleMoviePress}
-          />
-        )}
-        keyExtractor={(item) => item.url}
-        numColumns={2}
-        contentContainerStyle={styles.movieList}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-          />
-        }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={renderLoading}
-      />
+      {loading ? <Skeleton loading={loading} /> : (
+        <FlatList
+          ref={flatListRef}
+          data={list}
+          renderItem={renderMovieItem}
+          keyExtractor={(item) => item.href}
+          numColumns={2}
+          contentContainerStyle={styles.movieList}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={['#E50914']}
+              tintColor="#E50914"
+              title="正在刷新..."
+              titleColor="#E50914"
+            />
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderLoading}
+        />
+      )}
     </View>
   );
 };
@@ -280,19 +269,19 @@ const MovieSearchPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   searchContainer: {
-    padding: 10,
-    backgroundColor: '#f8f8f8',
+    padding: 15,
+    backgroundColor: 'transparent',
   },
   searchInput: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    height: 50,
+    color: '#fff',
+    fontSize: 16,
   },
   movieList: {
     paddingHorizontal: 10,
@@ -303,7 +292,7 @@ const styles = StyleSheet.create({
     margin: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 10,
     padding: 10,
   },
@@ -317,6 +306,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
+    color: '#fff',
   },
 });
 

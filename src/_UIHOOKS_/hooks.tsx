@@ -18,8 +18,7 @@ export interface UIProviderProps {
 export const UIProvider = (props: UIProviderProps) => {
   const [isClient, setIsClient] = useState(false)
   const apps = useAppSelector(state => state.apps);
-  const { __ENV__ } = apps;
-  
+
   useEffect(() => {
     setIsClient(true)
   }, [])
@@ -29,12 +28,6 @@ export const UIProvider = (props: UIProviderProps) => {
       ...TVService.czzy,
     } as SDKType}
   >
-    {
-      isClient && __ENV__ !== 'MASTER' ? <View
-      >
-        <Text style={{ fontSize: 10, color: '#fff' }}>{__ENV__}</Text>
-      </View> : undefined
-    }
     {
       typeof props.children === 'function' ? props.children() : props?.children
     }
@@ -53,5 +46,5 @@ export function useUI(): SDKType {
 }
 
 export interface SDKType extends TVideoProvider {
-  
+
 }

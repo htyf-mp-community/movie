@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, FlatList, TouchableOpacity, RefreshControl, ListRenderItem } from 'react-native';
+import { View, FlatList, TouchableOpacity, RefreshControl, ListRenderItem, Alert, Image } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
@@ -7,12 +7,14 @@ import lodash from 'lodash';
 import { setDBData, setHomeData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
 import jssdk from '@htyf-mp/js-sdk';
 import Item from '@/components/item';
+import Skeleton from '@/components/Skeleton';
 import type { TVideo } from '@/services';
 import type { HistoryItem, AppsState } from '@/_UIHOOKS_/store/slices/appsSlice';
 
 // 首页状态接口
 interface HomeState {
   items?: string[];
+  videos?: TVideo[];
   [key: string]: any;
 }
 
@@ -30,8 +32,9 @@ function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const home = apps?.home;
+  const home = apps?.home as HomeState;
   const isDebug = apps?.__ENV__ === 'DEV';
+  const [isLoading, setIsLoading] = useState(true);
 
   /**
    * 获取首页数据
@@ -39,21 +42,24 @@ function Home() {
    */
   const getData = useCallback(async () => {
     setIsRefreshing(true);
+    setIsLoading(true);
     try {
-      const data = await ui.getHomeVideoList();
-      if (data[0]) {
+      const videos = await ui.getHomeVideoList();
+      if (videos && videos.length > 0) {
         dispatch(
           setHomeData({
-            ...data,
-            items: data[0]?.videos?.map((video) => video.href),
+            videos,
+            items: videos.map((video) => video.href),
           }),
         );
-        dispatch(setDBData(data[0]?.videos));
+        dispatch(setDBData(videos));
       }
     } catch (error) {
       console.error('获取首页数据失败:', error);
+      Alert.alert('提示', '加载数据失败，请稍后重试');
     } finally {
       setIsRefreshing(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -100,11 +106,13 @@ function Home() {
         <FlatList
           data={hisList}
           renderItem={({ item }) => (
-            <Item
-              key={item.url}
-              url={item.url}
-              onPress={handleVideoPress}
-            />
+            <View style={tw`w-[250px]`}>
+              <Item
+                key={item.url}
+                url={item.url}
+                onPress={handleVideoPress}
+              />
+            </View>
           )}
           keyExtractor={(item) => item.url}
           horizontal
@@ -119,12 +127,23 @@ function Home() {
   /**
    * 渲染视频项
    */
-  const renderVideoItem: ListRenderItem<string> = useCallback(({ item }) => (
-    <Item
-      url={item}
-      onPress={handleVideoPress}
-    />
-  ), [handleVideoPress]);
+  const renderVideoItem: ListRenderItem<string> = useCallback(({ item }) => {
+    const video = home?.videos?.find(v => v.href === item);
+    if (!video) return null;
+
+    return (
+      <Item
+        url={item}
+        title={video.title}
+        year={video.year}
+        cover={video.cover}
+        rating={video.rating}
+        type={video.details?.type}
+        description={video.description}
+        onPress={handleVideoPress}
+      />
+    );
+  }, [home?.videos, handleVideoPress]);
 
   // 初始化加载数据
   useEffect(() => {
@@ -132,37 +151,46 @@ function Home() {
   }, []);
 
   return (
-    <View style={tw`flex-1`}>
+    <View style={tw`flex-1 bg-black`}>
       <Appbar.Header
         mode="small"
-        style={tw`h-[50px]`}
+        style={tw`h-[50px] bg-black`}
       >
-        <Appbar.Content titleStyle={tw`text-[18px]`} title="首页" />
+        <Appbar.Content titleStyle={tw`text-[18px] text-white`} title="首页" />
       </Appbar.Header>
-      
+
       <TouchableOpacity
-        style={tw`p-[10px] bg-[#f8f8f8] rounded-[20px] m-[10px]`}
+        style={tw`p-[10px] bg-[#333] rounded-[20px] m-[10px]`}
         onPress={handleSearchPress}
       >
         <Text style={tw`text-[#888] text-[16px] text-center`}>点击搜索电影...</Text>
       </TouchableOpacity>
 
-      <FlatList
-        style={tw`flex-1`}
-        data={home?.items || []}
-        ListHeaderComponent={renderHistoryList}
-        ListFooterComponent={() => <View style={tw`h-[180px]`} />}
-        renderItem={renderVideoItem}
-        keyExtractor={(item, index) => `${index}_${item}`}
-        numColumns={NUM_COLUMNS}
-        contentContainerStyle={tw`px-[10px]`}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={getData}
-          />
-        }
-      />
+      {isLoading ? (
+        <View style={tw`flex-1 items-center justify-center`}>
+          <Skeleton loading={isLoading} />
+        </View>
+      ) : (
+        <FlatList
+          style={tw`flex-1`}
+          data={home?.items || []}
+          ListHeaderComponent={renderHistoryList}
+          ListFooterComponent={() => <View style={tw`h-[180px]`} />}
+          renderItem={renderVideoItem}
+          keyExtractor={(item, index) => `${index}_${item}`}
+          numColumns={NUM_COLUMNS}
+          contentContainerStyle={tw`px-[10px]`}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={getData}
+              tintColor="#fff"
+              titleColor="#fff"
+              title="正在加载..."
+            />
+          }
+        />
+      )}
     </View>
   );
 }

@@ -39,7 +39,7 @@ export default function createRouter(): ComponentType {
     const pages = useMemo(() => {
       return routers.map((name) => {
         const PageComponent = lodash.get(routerConf, name) as PageComponent | undefined;
-        
+
         if (!PageComponent) {
           console.warn(`页面组件 ${name} 未找到`);
           return null;

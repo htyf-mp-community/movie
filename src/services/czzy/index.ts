@@ -1,78 +1,34 @@
 import URLParse from 'url-parse';
 import jssdk from '@htyf-mp/js-sdk';
-import type { TVideoProvider, TVideo, TVideoURL } from '../types';
-import jsCrawler from './index.umd.string';
-import { Alert } from 'react-native';
+import type { TVideoProvider, TVideo, TVideoURL, SearchResult, CategoryResponse } from '../types';
 
-const host = "https://www.czzy77.com/"
+// 常量定义
+const HOST = "https://www.czzy77.com/";
+const DEFAULT_TIMEOUT = 1000 * 30; // 30秒
+const DEFAULT_WAIT = 2000; // 2秒
 
-// 视频项接口
-interface VideoItem {
-  href: string;
-  img: string;
-  title: string;
-  status: string;
-}
-
-// 视频源接口
-interface VideoSource {
-  href: string;
-  ep: string;
-}
-
-// 视频播放信息接口
-interface VideoPlayInfo {
+interface VideoPlaybackInfo {
+  isIframe: boolean;
   url: string;
   headers: Record<string, string>;
-}
-
-// 视频详情接口
-interface VideoDetail {
-  [key: string]: VideoSource[];
-}
-
-// 搜索结果接口
-interface SearchResult {
-  page: number;
-  list: VideoItem[];
-}
-
-// 首页视频列表接口
-interface HomeVideoList {
-  href: string;
-  title: string;
-  videos: VideoItem[];
-}
-
-/**
- * WebView 授权检查接口
- */
-interface WebViewAuthResponse {
-  items?: any[];
-  [key: string]: any;
-}
-
-/**
- * 首页数据响应接口
- */
-interface HomeDataResponse {
-  items?: Array<{
-    url: string;
-    img: string;
-    name: string;
-  }>;
-  [key: string]: any;
 }
 
 /**
  * 检查 WebView 是否已授权
  * 通过访问首页并检查返回数据来判断授权状态
+ * 使用双重检查机制，第一次快速检查，失败后等待重试
+ * 
  * @returns Promise<boolean> - 返回授权状态，true 表示已授权，false 表示未授权
  */
 export const checkWebViewAuth = async (): Promise<boolean> => {
+  /**
+   * 尝试进行授权检查
+   * @param debug - 是否启用调试模式
+   * @returns Promise<boolean> - 授权检查结果
+   */
   const tryAuth = async (debug: boolean): Promise<boolean> => {
     try {
-      const url = `${host}`;
+      const url = HOST;
       const data: boolean = await jssdk.puppeteer({
         url,
         jscode: `function(callback) {
@@ -121,10 +77,11 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
       return false;
     }
   };
-  // 第一次尝试，debug=true
-  const firstAttempt = await tryAuth(false);
+
+  // 第一次快速检查
+  const firstAttempt = await tryAuth(__DEV__ ? true : false);
   
-  // 如果第一次失败，等待一段时间后再次尝试
+  // 如果第一次失败，等待后重试
   if (!firstAttempt) {
     console.log('第一次授权检查失败，等待 0.5 秒后重试...');
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -134,99 +91,188 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
   return firstAttempt;
 };
 
-
 /**
  * 获取视频搜索结果
+ * 通过 puppeteer 获取视频搜索结果，支持分页
+ * 
  * @param keyword - 搜索关键词
  * @param page - 页码，默认为1
- * @returns 搜索结果，包含视频列表和页码信息
+ * @returns Promise<SearchResult> - 返回搜索结果和分页信息
+ * @throws Error - 当未授权或获取数据失败时抛出错误
  */
 export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = async (
   keyword: string,
   page: number = 1
-) => {
+): Promise<SearchResult> => {
   try {
+    // 检查授权状态
     const isAuth = await checkWebViewAuth();
     if (!isAuth) {
       throw new Error('WebView 未授权，无法获取首页数据');
     }
-    const url = `${host}daoyongjiekoshibushiy0ubing?q=${encodeURIComponent(keyword)}&f=_all&p=${page}`;
+
+    // 构建搜索 URL
+    const url = `${HOST}daoyongjiekoshibushiy0ubing?q=${encodeURIComponent(keyword)}`;
+    // 使用 puppeteer 获取搜索结果
     const data = await jssdk.puppeteer({
       url,
       jscode: `function(callback) {
         try {
+          /**
+           * 获取电影列表
+           * @returns {TVideo[]} 电影列表
+           */
           function getMovieList() {
-            const movieList = [];
-            const movieItems = document.querySelectorAll('.search_list li');
+            try {
+              var movieList = [];
+              var movieItems = document.querySelectorAll('.search_list li');
 
-            movieItems.forEach(item => {
-              const movie = {
-                title: item.querySelector('.dytit a').textContent,
-                link: item.querySelector('.dytit a').href,
-                image: item.querySelector('img').src,
-                actors: item.querySelector('.inzhuy').textContent.replace('主演：', '')
-              };
-              movieList.push(movie);
-            });
+              movieItems.forEach(function(item) {
+                try {
+                  var titleElement = item.querySelector('.dytit a');
+                  var imageElement = item.querySelector('img');
+                  var actorsElement = item.querySelector('.inzhuy');
 
-            return movieList;
+                  if (!titleElement || !imageElement || !actorsElement) {
+                    console.warn('电影项缺少必要元素');
+                    return;
+                  }
+
+                  var href = titleElement.getAttribute('href');
+                  var title = titleElement.textContent ? titleElement.textContent.trim() : '';
+                  var cover = imageElement.getAttribute('src');
+                  var actorsText = actorsElement.textContent ? actorsElement.textContent.replace('主演：', '').trim() : '';
+
+                  if (!href || !title || !cover) {
+                    console.warn('电影项数据不完整');
+                    return;
+                  }
+
+                  movieList.push({
+                    href: href,
+                    title: title,
+                    year: '',
+                    cover: cover,
+                    details: {
+                      type: '',
+                      region: '',
+                      year: '',
+                      alias: [],
+                      releaseDate: '',
+                      director: [],
+                      writer: [],
+                      actors: actorsText ? actorsText.split(',').map(function(actor) { return actor.trim(); }) : [],
+                      language: ''
+                    },
+                    description: '',
+                    playList: []
+                  });
+                } catch (itemError) {
+                  console.warn('处理单个电影项时出错:', itemError);
+                }
+              });
+
+              return movieList;
+            } catch (error) {
+              console.error('获取电影列表时出错:', error);
+              return [];
+            }
           }
 
-          // 获取分页信息
           function getPaginationInfo() {
-            const pagination = {
-              currentPage: 1,
-              totalPages: 0,
-              pages: []
-            };
+            try {
+              var pagination = {
+                currentPage: 1,
+                totalPages: 0,
+                pages: []
+              };
 
-            const paginationLinks = document.querySelectorAll('.pagenavi_txt a');
+              var paginationLinks = document.querySelectorAll('.pagenavi_txt a');
 
-            paginationLinks.forEach(link => {
-              if (link.classList.contains('current')) {
-                pagination.currentPage = parseInt(link.textContent);
-              } else {
-                const pageNum = parseInt(link.textContent);
-                pagination.pages.push({
-                  number: pageNum,
-                  url: link.href
-                });
-              }
-            });
+              paginationLinks.forEach(function(link) {
+                try {
+                  var pageText = link.textContent ? link.textContent.trim() : '';
+                  if (!pageText) {
+                    console.warn('分页链接文本为空');
+                    return;
+                  }
 
-            // 获取总页数
-            pagination.totalPages = Math.max(...pagination.pages.map(p => p.number), pagination.currentPage);
+                  var pageNum = parseInt(pageText);
+                  if (isNaN(pageNum)) {
+                    console.warn('分页链接文本不是有效数字:', pageText);
+                    return;
+                  }
 
-            return pagination;
+                  var href = link.getAttribute('href');
+                  if (!href) {
+                    console.warn('分页链接缺少href属性');
+                    return;
+                  }
+
+                  if (link.classList.contains('current')) {
+                    pagination.currentPage = pageNum;
+                  } else {
+                    pagination.pages.push({
+                      number: pageNum,
+                      url: href,
+                      isCurrent: false
+                    });
+                  }
+                } catch (linkError) {
+                  console.warn('处理分页链接时出错:', linkError);
+                }
+              });
+
+              // 计算总页数
+              pagination.totalPages = Math.max.apply(null, 
+                pagination.pages.map(function(p) { return p.number; }).concat([pagination.currentPage])
+              );
+
+              return pagination;
+            } catch (error) {
+              console.error('获取分页信息时出错:', error);
+              return {
+                currentPage: 1,
+                totalPages: 0,
+                pages: []
+              };
+            }
           }
 
-          // 使用示例
-          const movies = getMovieList();
-          const pagination = getPaginationInfo();
-          if (movies.length) {
+          // 获取数据
+          var movies = getMovieList();
+          var pagination = getPaginationInfo();
+
+          if (movies.length > 0) {
             callback(undefined, {
-              pagination,
+              pagination: pagination,
               list: movies,
             });
+          } else {
+            console.warn('未找到搜索结果');
+            callback(new Error('未找到搜索结果'), undefined);
           }
         } catch (error) {
-          alert(error);
+          console.error('获取搜索结果时出错:', error);
           callback(error, undefined);
         }
       }`,
       debug: false,
-      wait: 2000,
-      timeout: 1000 * 10,
+      wait: DEFAULT_WAIT,
+      timeout: DEFAULT_TIMEOUT,
       callback: () => {},
     });
-
 
     return data;
   } catch (error) {
     console.error('搜索视频失败:', error);
     return {
-      page,
-      list: [],
+      pagination: {
+        currentPage: page,
+        totalPages: 0,
+        pages: []
+      },
+      list: []
     };
   }
 };
@@ -234,10 +280,10 @@ export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = asyn
 /**
  * 获取首页视频列表
  * 首先检查 WebView 授权状态，然后获取首页视频数据
- * @returns Promise<HomeVideoList[]> - 返回首页视频列表数据
+ * @returns Promise<TVideo[]> - 返回首页视频列表数据
  * @throws Error - 当未授权或获取数据失败时抛出错误
  */
-export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async () => {
+export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async (): Promise<TVideo[]> => {
   try {
     // 检查授权状态
     const isAuth = await checkWebViewAuth();
@@ -269,42 +315,50 @@ export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async () => 
               );
     
               return {
+                  href: link?.href || '',
                   title: title,
-                  url: link?.href || '',
-                  img: img || '',
+                  year: '',
+                  cover: img || '',
                   rating: rating,
-                  status: status,
-                  hdInfo: hdInfo,
-                  jidi: jidi
+                  details: {
+                      type: '',
+                      region: '',
+                      year: '',
+                      alias: [],
+                      releaseDate: '',
+                      director: [],
+                      writer: [],
+                      actors: status.split(',').map(actor => actor.trim()),
+                      language: ''
+                  },
+                  description: '',
+                  playList: []
               };
           })
           .filter(item => {
               // 过滤掉没有图片的电影
-              if (!item.img) return false;
+              if (!item.cover) return false;
               
               // 检查URL是否已经处理过
-              if (processedUrls.has(item.url)) {
+              if (processedUrls.has(item.href)) {
                   return false;
               }
               
               // 将URL添加到已处理集合中
-              processedUrls.add(item.url);
+              processedUrls.add(item.href);
               return true;
           });
     
-        callback(undefined, {
-          items: movieList,
-        });
+        callback(undefined, movieList);
       } catch (error) {
         alert(error);
-        callback(undefined, {
-          items: [],
-        });
+        callback(undefined, []);
       }
     }`;
+
     // 获取首页数据
-    const data: HomeDataResponse = await jssdk.puppeteer({
-      url: `${host}`,
+    const data: TVideo[] = await jssdk.puppeteer({
+      url: `${HOST}`,
       jscode: `${funStr}`,
       debug: false,
       wait: 2000,
@@ -312,44 +366,27 @@ export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async () => 
       callback: () => {},
     });
 
-    // 处理返回数据
-    const videos: VideoItem[] = Array.isArray(data?.items) 
-      ? data.items.map((item) => ({
-          href: item.url,
-          img: item.img,
-          title: item.title,
-          status: '',
-        }))
-      : [];
-
-    return [{
-      href: '',
-      title: '热门',
-      videos,
-    }];
+    return data;
   } catch (error) {
     console.error('获取首页视频列表失败:', error);
-    // 返回空列表而不是抛出错误，保持接口稳定性
-    return [{
-      href: '',
-      title: '热门',
-      videos: [],
-    }];
+    // 返回空数组而不是抛出错误，保持接口稳定性
+    return [];
   }
 };
 
 /**
  * 获取视频分类列表
- * @returns 视频分类列表数据
+ * @param url - 分类URL
+ * @returns Promise<CategoryResponse> - 返回分类列表数据
  */
-export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (url?: string) => {
+export const getVideoCategory: TVideoProvider['getVideoCategory'] = async (url?: string): Promise<CategoryResponse> => {
   try {
     const isAuth = await checkWebViewAuth();
     if (!isAuth) {
       throw new Error('WebView 未授权，无法获取首页数据');
     }
     const data = await jssdk.puppeteer({
-      url: url || `${host}/movie_bt`,
+      url: url || `${HOST}/movie_bt`,
       jscode: `function(callback) {
         try {
           // 获取所有分类信息
@@ -489,22 +526,31 @@ export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (u
                           const imageElement = movie.querySelector('.thumb.lazy');
                           
                           const movieInfo = {
+                              href: titleElement?.href || '',
                               title: titleElement?.textContent?.trim() || '未知标题',
-                              rating: ratingElement?.textContent?.trim() || '暂无评分',
-                              actors: actorsElement?.textContent?.replace('主演：', '')?.trim() || '未知演员',
-                              type: typeElement?.textContent?.trim() || '未知类型',
-                              episodes: episodesElement?.textContent?.trim() || '未知集数',
-                              url: titleElement?.href || '',
-                              image: imageElement?.getAttribute('data-original') || ''
+                              year: '',
+                              cover: imageElement?.getAttribute('data-original') || '',
+                              details: {
+                                  type: typeElement?.textContent?.trim() || '未知类型',
+                                  region: '',
+                                  year: '',
+                                  alias: [],
+                                  releaseDate: '',
+                                  director: [],
+                                  writer: [],
+                                  actors: actorsElement?.textContent?.replace('主演：', '')?.trim().split(',') || [],
+                                  language: ''
+                              },
+                              description: '',
+                              playList: []
                           };
                           
                           // 只添加有效数据的电影
-                          if (movieInfo.title && movieInfo.url) {
+                          if (movieInfo.title && movieInfo.href) {
                               movies.push(movieInfo);
                           }
                       } catch (itemError) {
                           console.error('处理单个电影项时出错:', itemError);
-                          // 继续处理下一个电影项
                       }
                   });
                   
@@ -557,7 +603,6 @@ export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (u
                           }
                       } catch (linkError) {
                           console.error('处理分页链接时出错:', linkError);
-                          // 继续处理下一个链接
                       }
                   });
                   
@@ -601,7 +646,6 @@ export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (u
       callback: () => {},
     });
 
-
     return data;
   } catch (error) {
     console.error('搜索视频失败:', error);
@@ -611,66 +655,138 @@ export const getVideoCategory: TVideoProvider['getVideoSearchResult'] = async (u
 
 /**
  * 获取视频详情和播放源
+ * 通过 puppeteer 获取视频详情信息，包含播放源列表
+ * 优化了数据提取和错误处理
+ * 
  * @param path - 视频路径
- * @returns Promise<VideoDetail> - 返回视频详情信息，包含播放源列表
+ * @returns Promise<TVideo> - 返回视频详情信息，包含播放源列表
  * @throws Error - 当获取数据失败时抛出错误
  */
-export const getVideoSources: TVideoProvider['getVideoSources'] = async (path: string) => {
+export const getVideoSources: TVideoProvider['getVideoSources'] = async (path: string): Promise<TVideo> => {
   try {
     // 检查授权状态
     const isAuth = await checkWebViewAuth();
     if (!isAuth) {
       throw new Error('WebView 未授权，无法获取首页数据');
     }
+
+    // 构建完整的 URL
     const urlObj = new URLParse(path, true);
+    const fullUrl = urlObj.set('origin', HOST?.replace(/\/$/gi, '')).toString();
+
+    // 使用 puppeteer 获取视频详情
     const data: TVideo = await jssdk.puppeteer({
-      url: urlObj.set('origin', host?.replace(/\/$/gi, '')).toString(),
+      url: fullUrl,
       jscode: `function(callback) {
         try {
-          const movie = {
-            href: window.location.href,
+          /**
+           * 获取电影详情信息
+           * @returns {TVideo} 电影详情
+           */
+          const getMovieInfo = () => {
             // 基本信息
-            title: document.querySelector('.dy_tit_big')?.textContent?.split('|')[0]?.trim() || '',
-            year: document.querySelector('.dy_tit_big span')?.textContent?.trim() || '',
-            cover: document.querySelector('.dyimg img')?.src || '',
+            const titleElement = document.querySelector('.dy_tit_big');
+            const yearElement = document.querySelector('.dy_tit_big span');
+            const coverElement = document.querySelector('.dyimg img');
             
             // 详细信息
-            details: {
-              type: Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('类型'))?.querySelector('a')?.textContent || '',
-              region: Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('地区'))?.querySelector('a')?.textContent || '',
-              year: Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('年份'))?.querySelector('a')?.textContent || '',
-              alias: Array.from(Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('又名'))?.querySelectorAll('a') || []).map(a => a?.textContent || '').filter(Boolean) || [],
-              releaseDate: Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('上映'))?.querySelector('span')?.textContent || '',
-              director: Array.from(Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('导演'))?.querySelectorAll('span') || []).map(span => span?.textContent || '').filter(Boolean) || [],
-              writer: Array.from(Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('编剧'))?.querySelectorAll('span') || []).map(span => span?.textContent || '').filter(Boolean) || [],
-              actors: Array.from(Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('主演'))?.querySelectorAll('span') || []).map(span => span?.textContent || '').filter(Boolean) || [],
-              language: Array.from(document.querySelectorAll('.moviedteail_list li') || []).find(li => li?.textContent?.includes('语言'))?.querySelector('span')?.textContent || ''
-            },
-            
-            // 剧情简介
-            description: document.querySelector('.yp_context')?.textContent?.trim() || '',
-            
-            // 播放列表
-            playList: Array.from(document.querySelectorAll('.paly_list_btn a') || []).map(a => ({
-              title: a?.textContent || '',
-              url: a?.href || ''
-            })).filter(item => item.title && item.url)
+            const details = {
+              type: '',
+              region: '',
+              year: '',
+              alias: [],
+              releaseDate: '',
+              director: [],
+              writer: [],
+              actors: [],
+              language: ''
+            };
+
+            // 提取详细信息
+            const detailItems = document.querySelectorAll('.moviedteail_list li');
+            detailItems.forEach(item => {
+              const text = item.textContent?.trim() || '';
+              const value = item.querySelector('span, a')?.textContent?.trim() || '';
+              
+              if (text.includes('类型')) {
+                details.type = value;
+              } else if (text.includes('地区')) {
+                details.region = value;
+              } else if (text.includes('年份')) {
+                details.year = value;
+              } else if (text.includes('又名')) {
+                details.alias = Array.from(item.querySelectorAll('a'))
+                  .map(a => a.textContent?.trim() || '')
+                  .filter(Boolean);
+              } else if (text.includes('上映')) {
+                details.releaseDate = value;
+              } else if (text.includes('导演')) {
+                details.director = Array.from(item.querySelectorAll('span'))
+                  .map(span => span.textContent?.trim() || '')
+                  .filter(Boolean);
+              } else if (text.includes('编剧')) {
+                details.writer = Array.from(item.querySelectorAll('span'))
+                  .map(span => span.textContent?.trim() || '')
+                  .filter(Boolean);
+              } else if (text.includes('主演')) {
+                details.actors = Array.from(item.querySelectorAll('span'))
+                  .map(span => span.textContent?.trim() || '')
+                  .filter(Boolean);
+              } else if (text.includes('语言')) {
+                details.language = value;
+              }
+            });
+
+            // 获取播放列表
+            const playList = Array.from(document.querySelectorAll('.paly_list_btn a'))
+              .map(a => ({
+                title: a.textContent?.trim() || '',
+                url: a.href || ''
+              }))
+              .filter(item => item.title && item.url);
+
+            return {
+              href: window.location.href,
+              title: titleElement?.textContent?.split('|')[0]?.trim() || '',
+              year: yearElement?.textContent?.trim() || '',
+              cover: coverElement?.src || '',
+              details,
+              description: document.querySelector('.yp_context')?.textContent?.trim() || '',
+              playList
+            };
           };
-          if (movie.playList.length) {
-            callback(undefined, movie);
-          } else {
-            callback(undefined, movie);
+
+          // 使用 MutationObserver 监听 DOM 变化
+          const observer = new MutationObserver(() => {
+            const movie = getMovieInfo();
+            if (movie.playList.length > 0) {
+              observer.disconnect();
+              callback(undefined, movie);
+            }
+          });
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+
+          // 初始检查
+          const initialMovie = getMovieInfo();
+          if (initialMovie.playList.length > 0) {
+            observer.disconnect();
+            callback(undefined, initialMovie);
           }
         } catch (error) {
-          alert(error);
+          console.error('获取视频详情时出错:', error);
           callback(error, undefined);
         }
       }`,
       debug: false,
-      wait: 2000,
-      timeout: 1000 * 30,
+      wait: DEFAULT_WAIT,
+      timeout: DEFAULT_TIMEOUT,
       callback: () => {},
     });
+
     return data;
   } catch (error) {
     console.error('获取视频详情失败:', error);
@@ -679,22 +795,10 @@ export const getVideoSources: TVideoProvider['getVideoSources'] = async (path: s
 };
 
 /**
- * 视频播放信息接口
- */
-interface VideoPlaybackInfo {
-  isIframe: boolean;
-  url: string;
-  headers: {
-    referer: string;
-    origin: string;
-    host: string;
-    cookie?: string;
-  };
-}
-
-/**
  * 获取视频播放地址
- * @description 通过 puppeteer 获取视频播放地址，支持直接播放和 iframe 嵌套播放两种情况
+ * 通过 puppeteer 获取视频播放地址，支持直接播放和 iframe 嵌套播放两种情况
+ * 优化了错误处理和重试机制
+ * 
  * @param path - 视频页面路径
  * @returns Promise<TVideoURL> - 返回视频播放信息，包含播放地址和必要的请求头
  * @throws Error - 当 WebView 未授权或无法获取播放地址时抛出错误
@@ -709,12 +813,17 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
 
     // 构建完整的 URL
     const urlObj = new URLParse(path, true);
-    const fullUrl = urlObj.set('origin', host?.replace(/\/$/gi, '')).toString();
+    const fullUrl = urlObj.set('origin', HOST?.replace(/\/$/gi, '')).toString();
 
     // 提取视频信息的 JavaScript 代码
     const extractVideoInfoCode = `function(callback) {
       try {
+        /**
+         * 获取视频信息
+         * @returns {VideoPlaybackInfo | null} 视频播放信息
+         */
         const getVideoInfo = () => {
+          // 检查 iframe
           const iframe = document.querySelector('iframe');
           if (iframe?.src) {
             return {
@@ -729,6 +838,7 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
             };
           }
 
+          // 检查 video 标签
           const videoNode = document.querySelector('video');
           const videoUrl = videoNode?.getAttribute('src') || videoNode?.querySelector('source')?.src;
           if (videoUrl) {
@@ -747,17 +857,33 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
           return null;
         };
 
-        const videoInfo = getVideoInfo();
-        if (videoInfo) {
-          callback(undefined, videoInfo);
-        } else {
-          callback(new Error('未找到视频元素'), undefined);
+        // 使用 MutationObserver 监听 DOM 变化
+        const observer = new MutationObserver(() => {
+          const videoInfo = getVideoInfo();
+          if (videoInfo) {
+            observer.disconnect();
+            callback(undefined, videoInfo);
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+
+        // 初始检查
+        const initialVideoInfo = getVideoInfo();
+        if (initialVideoInfo) {
+          observer.disconnect();
+          callback(undefined, initialVideoInfo);
         }
       } catch (error) {
+        console.error('获取视频信息时出错:', error);
         callback(error, undefined);
       }
     }`;
 
+    // 通用请求头
     const headers = {
       'Accept': '*/*',
       'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7',
@@ -780,8 +906,8 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
       url: fullUrl,
       jscode: extractVideoInfoCode,
       debug: false,
-      wait: 2000,
-      timeout: 1000 * 30,
+      wait: DEFAULT_WAIT,
+      timeout: DEFAULT_TIMEOUT,
       callback: () => {},
     }) as VideoPlaybackInfo;
 
@@ -791,14 +917,13 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
 
     // 处理直接播放的情况
     if (!data.isIframe) {
-      const videoInfo = {
+      return {
         url: data.url,
         headers: {
           ...headers,
-          host: URLParse(host, true).host || '',
+          host: URLParse(HOST, true).host || '',
         },
-      }
-      return videoInfo;
+      };
     }
 
     // 处理 iframe 播放的情况
@@ -813,22 +938,22 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
         'sec-fetch-site': 'cross-site',
       },
       debug: false,
-      wait: 2000,
-      timeout: 1000 * 30,
+      wait: DEFAULT_WAIT,
+      timeout: DEFAULT_TIMEOUT,
       callback: () => {},
     }) as VideoPlaybackInfo;
 
     if (!iframeData?.url) {
       throw new Error('无法获取 iframe 中的视频播放地址');
     }
-    const videoInfo = {
+
+    return {
       url: iframeData.url,
       headers: {
         ...headers,
         'Host': URLParse(iframeData.url, true).host || '',
       },
     };
-    return videoInfo;
 
   } catch (error) {
     console.error('获取视频播放地址失败:', error);
