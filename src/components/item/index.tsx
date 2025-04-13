@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, ViewStyle, TextStyle, ImageStyle } from "react-native";
 import URLParse from "url-parse";
-import lodash from 'lodash';
-import { useAppSelector } from "@/_UIHOOKS_";
+import { useAppStore } from "@/store";
 import type { TVideo } from '@/services';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -46,21 +45,19 @@ interface Styles {
  * @returns 电影项组件
  */
 const Item: React.FC<ItemProps> = (props) => {
-  const apps = useAppSelector(i => i.apps);
+  const appStore = useAppStore();
 
   /**
    * 解析URL并获取电影信息
    */
   const info = useMemo(() => {
     try {
-      const urlObj = new URLParse(props.url, true);
-      const itemData = lodash.get(apps?.db || {}, `${urlObj.pathname}`, undefined) as TVideo | undefined;
-      return itemData;
+      return appStore.getVideoData(props.url);
     } catch (error) {
       console.error('解析URL失败:', error);
       return undefined;
     }
-  }, [apps.db, props.url]);
+  }, [appStore, props.url]);
 
   /**
    * 处理点击事件
@@ -68,10 +65,13 @@ const Item: React.FC<ItemProps> = (props) => {
   const handlePress = useMemo(() => {
     return () => {
       if (info) {
-        props?.onPress?.(info);
+        props?.onPress?.({
+          ...info,
+          url: props.url,
+        });
       }
     };
-  }, [info, props.onPress]);
+  }, [props.url, info, props.onPress]);
 
   return (
     <TouchableOpacity

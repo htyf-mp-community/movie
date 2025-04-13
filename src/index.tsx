@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { StoreProvider, UIProvider } from '@/_UIHOOKS_'
+import { UIProvider } from '@/hooks'
 
 import createRouter from './router'
 
@@ -31,11 +31,9 @@ function RootFix(props: any) {
 const MiniApp = () => {
   return (
     <NavigationContainer>
-      <StoreProvider>
-        <UIProvider>
-          <RootFix />
-        </UIProvider>
-      </StoreProvider>
+      <UIProvider>
+        <RootFix />
+      </UIProvider>
     </NavigationContainer>
   );
 };

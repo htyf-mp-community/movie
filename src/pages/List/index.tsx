@@ -1,4 +1,4 @@
-import { setDBData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
+import { useUI } from '@/hooks';
 import tw from 'twrnc';
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView, Alert, SafeAreaView } from 'react-native';
@@ -9,12 +9,17 @@ import { useNavigation } from '@react-navigation/native';
 import type { TVideo } from '@/services';
 import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/categories';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
+import { useAppStore } from '@/store';
 
 // 电影列表项接口
 interface MovieItem {
   url: string;
   name: string;
   img?: string;
+  year: string;
+  type: string;
+  rating?: string;
+  description: string;
   [key: string]: any;
 }
 
@@ -41,8 +46,6 @@ const MovieListPage: React.FC = () => {
   // 引用和状态
   const flatListRef = useRef<FlatList<MovieItem>>(null);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const apps = useAppSelector((state) => state.apps);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [selectedTab, setSelectedTab] = useState('全部');
@@ -60,6 +63,9 @@ const MovieListPage: React.FC = () => {
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(true);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['50%', '75%'], []);
+
+  // 从 useAppStore 获取数据和方法
+  const updateVideoData = useAppStore(state => state.updateVideoData);
 
   /**
    * 获取电影列表数据
@@ -91,7 +97,9 @@ const MovieListPage: React.FC = () => {
                   name: movie.title,
                   img: movie.cover,
                   year: movie.year,
-                  details: movie.details
+                  type: movie.type,
+                  rating: movie.rating,
+                  description: movie.description
                 }))
               };
             } else {
@@ -105,11 +113,18 @@ const MovieListPage: React.FC = () => {
                     name: movie.title,
                     img: movie.cover,
                     year: movie.year,
-                    details: movie.details
+                    type: movie.type,
+                    rating: movie.rating,
+                    description: movie.description
                   }))
                 ]
               };
             }
+          });
+
+          // 将每个电影数据保存到 useAppStore 中
+          response.list.forEach(movie => {
+            updateVideoData(movie.href, movie);
           });
 
           // 更新分页信息
@@ -126,7 +141,7 @@ const MovieListPage: React.FC = () => {
         setIsLoadingMore(false);
       }
     },
-    [selectedTab, setDataObj],
+    [selectedTab, setDataObj, updateVideoData],
   );
 
   /**
@@ -378,6 +393,9 @@ const MovieListPage: React.FC = () => {
       title={item.name}
       year={item.year}
       cover={item.img}
+      rating={item.rating}
+      type={item.type}
+      description={item.description}
       onPress={handleMoviePress}
     />
   ), [handleMoviePress]);

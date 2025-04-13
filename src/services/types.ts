@@ -9,30 +9,6 @@ export type TVideoPlayItem = {
 }
 
 /**
- * 视频详细信息类型
- */
-export type TVideoDetails = {
-    /** 视频类型 */
-    type: string;
-    /** 地区 */
-    region: string;
-    /** 年份 */
-    year: string;
-    /** 别名列表 */
-    alias: string[];
-    /** 发布日期 */
-    releaseDate: string;
-    /** 导演列表 */
-    director: string[];
-    /** 编剧列表 */
-    writer: string[];
-    /** 演员列表 */
-    actors: string[];
-    /** 语言 */
-    language: string;
-}
-
-/**
  * 视频信息类型
  */
 export type TVideo = {
@@ -46,8 +22,22 @@ export type TVideo = {
     cover: string;
     /** 视频评分 */
     rating?: string;
-    /** 视频详细信息 */
-    details: TVideoDetails;
+    /** 视频类型 */
+    type: string;
+    /** 地区 */
+    region: string;
+    /** 别名列表 */
+    alias: string[];
+    /** 发布日期 */
+    releaseDate: string;
+    /** 导演列表 */
+    director: string[];
+    /** 编剧列表 */
+    writer: string[];
+    /** 演员列表 */
+    actors: string[];
+    /** 语言 */
+    language: string;
     /** 视频描述 */
     description: string;
     /** 播放列表 */

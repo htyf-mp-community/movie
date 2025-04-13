@@ -2,92 +2,51 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl, Alert } from 'react-native';
 import tw from 'twrnc';
 import lodash from 'lodash';
-import { setDBData, useAppSelector, useDispatch, useUI } from '@/_UIHOOKS_';
+import { useUI } from '@/hooks';
 import { useImmer } from 'use-immer';
 import jssdk, { RequestOptions } from '@htyf-mp/js-sdk';
 import Item from '@/components/item';
-import jsCrawler, { host } from '@/utils/js-crawler';
 import { useNavigation } from '@react-navigation/native';
 import { Appbar } from 'react-native-paper';
 import type { TVideo } from '@/services';
 import Skeleton from '@/components/Skeleton';
+import { useAppStore } from '@/store';
 
-// 搜索请求参数接口
-interface SearchQuery {
-  name: string;
-  page: number;
-}
-
-// 搜索响应数据接口
-interface SearchResponse {
-  list: TVideo[];
-  [key: string]: any;
-}
-
-// 数据对象接口
+/**
+ * 数据对象接口
+ * @interface DataObject
+ * @property {TVideo[]} [key: string] - 按页码存储的视频数据
+ */
 interface DataObject {
   [key: string]: TVideo[];
 }
 
-// 分页信息接口
+/**
+ * 分页信息接口
+ * @interface PaginationInfo
+ * @property {number} currentPage - 当前页码
+ * @property {number} totalPages - 总页数
+ * @property {boolean} hasMore - 是否有更多数据
+ */
 interface PaginationInfo {
-  currentPage: number;      // 当前页码
-  totalPages: number;       // 总页数
-  hasMore: boolean;         // 是否有更多数据
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
 }
 
-/**
- * 获取搜索结果
- * @param query - 搜索参数
- * @param opt - 请求选项
- * @returns 搜索结果
- */
-export async function getSearch(
-  query: SearchQuery,
-  opt?: Partial<RequestOptions>,
-): Promise<SearchResponse | undefined> {
-  const url = `${host}daoyongjiek0shibushiyoubing?q=${query?.name}&f=_all&p=${query.page || 1}`;
-  const data = await jssdk?.puppeteer({
-    url,
-    jscode: `${jsCrawler}`,
-    debug: false,
-    wait: 2000,
-    timeout: 1000 * 10,
-    callback: () => { },
-    ...opt,
-  });
-  return data;
-}
-
-/**
- * 验证搜索功能是否可用
- * @returns 是否验证成功
- */
-export async function auth(): Promise<boolean> {
-  const query = { name: '我', page: 1 };
-  const data = await getSearch(query, {
-    debug: true,
-    wait: 0,
-    timeout: 1000 * 60 * 3,
-  });
-  return !!data;
-}
 
 let isFirstSearch = true;
 
 /**
  * 电影搜索页面组件
  * 提供搜索功能，显示搜索结果列表
+ * @component MovieSearchPage
  */
 const MovieSearchPage: React.FC = () => {
   // 引用和状态
   const ui = useUI();
   const flatListRef = useRef<FlatList<TVideo>>(null);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const apps = useAppSelector(i => i.apps);
-
-  // 状态管理
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [dataObj, setDataObj] = useImmer<DataObject>({});
@@ -99,12 +58,13 @@ const MovieSearchPage: React.FC = () => {
     hasMore: true,
   });
 
-  const isDebug = apps?.__ENV__ === 'DEV';
+  // 从 useAppStore 获取数据和方法
+  const updateVideoData = useAppStore(state => state.updateVideoData);
 
   /**
    * 获取搜索结果数据
-   * @param searchword - 搜索关键词
-   * @param page - 页码
+   * @param {string} searchword - 搜索关键词
+   * @param {number} page - 页码
    */
   const getData = useCallback(
     async (searchword: string = '', page: number = 1) => {
@@ -120,8 +80,12 @@ const MovieSearchPage: React.FC = () => {
           setLoading(true);
           const data = await ui.getVideoSearchResult(searchword, page);
           if (data?.list) {
-            // 直接使用返回的 TVideo 数据
-            dispatch(setDBData(data.list));
+            // 将每个电影数据保存到 useAppStore 中
+            data.list.forEach(movie => {
+              updateVideoData(movie.href, movie);
+            });
+
+            // 更新本地状态
             setDataObj(_dataObj => {
               if (page === 1) {
                 return { 1: data.list };
@@ -146,7 +110,7 @@ const MovieSearchPage: React.FC = () => {
         setIsRefreshing(false);
       }
     },
-    [dispatch, setDataObj, ui],
+    [setDataObj, ui, updateVideoData],
   );
 
   /**
@@ -187,7 +151,7 @@ const MovieSearchPage: React.FC = () => {
 
   /**
    * 处理电影项点击
-   * @param info - 电影信息
+   * @param {TVideo} info - 电影信息
    */
   const handleMoviePress = useCallback((info: TVideo) => {
     navigation.navigate('Details', {
@@ -213,6 +177,9 @@ const MovieSearchPage: React.FC = () => {
       title={item.title}
       year={item.year}
       cover={item.cover}
+      rating={item.rating}
+      type={item.type}
+      description={item.description}
       onPress={handleMoviePress}
     />
   ), [handleMoviePress]);

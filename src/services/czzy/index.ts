@@ -315,24 +315,22 @@ export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async (): Pr
               );
     
               return {
-                  href: link?.href || '',
-                  title: title,
-                  year: '',
-                  cover: img || '',
-                  rating: rating,
-                  details: {
-                      type: '',
-                      region: '',
-                      year: '',
-                      alias: [],
-                      releaseDate: '',
-                      director: [],
-                      writer: [],
-                      actors: status.split(',').map(actor => actor.trim()),
-                      language: ''
-                  },
-                  description: '',
-                  playList: []
+                href: link?.href || '',
+                title: title,
+                year: '',
+                cover: img || '',
+                rating: rating,
+                type: '',
+                region: '',
+                year: '',
+                alias: [],
+                releaseDate: '',
+                director: [],
+                writer: [],
+                actors: status.split(',').map(actor => actor.trim()),
+                language: '',
+                description: '',
+                playList: []
               };
           })
           .filter(item => {
@@ -348,7 +346,6 @@ export const getHomeVideoList: TVideoProvider['getHomeVideoList'] = async (): Pr
               processedUrls.add(item.href);
               return true;
           });
-    
         callback(undefined, movieList);
       } catch (error) {
         alert(error);
@@ -528,19 +525,16 @@ export const getVideoCategory: TVideoProvider['getVideoCategory'] = async (url?:
                           const movieInfo = {
                               href: titleElement?.href || '',
                               title: titleElement?.textContent?.trim() || '未知标题',
-                              year: '',
                               cover: imageElement?.getAttribute('data-original') || '',
-                              details: {
-                                  type: typeElement?.textContent?.trim() || '未知类型',
-                                  region: '',
-                                  year: '',
-                                  alias: [],
-                                  releaseDate: '',
-                                  director: [],
-                                  writer: [],
-                                  actors: actorsElement?.textContent?.replace('主演：', '')?.trim().split(',') || [],
-                                  language: ''
-                              },
+                              type: typeElement?.textContent?.trim() || '未知类型',
+                              region: '',
+                              year: '',
+                              alias: [],
+                              releaseDate: '',
+                              director: [],
+                              writer: [],
+                              actors: actorsElement?.textContent?.replace('主演：', '')?.trim().split(',') || [],
+                              language: '',
                               description: '',
                               playList: []
                           };
@@ -750,7 +744,7 @@ export const getVideoSources: TVideoProvider['getVideoSources'] = async (path: s
               title: titleElement?.textContent?.split('|')[0]?.trim() || '',
               year: yearElement?.textContent?.trim() || '',
               cover: coverElement?.src || '',
-              details,
+              ...details,
               description: document.querySelector('.yp_context')?.textContent?.trim() || '',
               playList
             };

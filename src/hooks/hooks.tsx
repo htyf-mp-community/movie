@@ -1,7 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
 import { TVService, TVideoProvider } from '@/services';
-import { useAppSelector } from './store';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -17,7 +15,6 @@ export interface UIProviderProps {
 
 export const UIProvider = (props: UIProviderProps) => {
   const [isClient, setIsClient] = useState(false)
-  const apps = useAppSelector(state => state.apps);
 
   useEffect(() => {
     setIsClient(true)
