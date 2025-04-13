@@ -164,12 +164,6 @@ function Details() {
 
     setPlayLoading(true);
     try {
-      // 更新历史记录
-      updateHistory({
-        url: url,
-        playUrl: url,
-        time: Date.now(),
-      });
       const data = await ui.getVideoUrl(url);
       if (!data?.url) {
         handleError('获取播放地址失败');
@@ -353,9 +347,18 @@ function Details() {
           onPress={handleOpenBottomSheet}
           disabled={!movieDetail?.playList?.length}
         >
-          <Text style={styles.playButtonText}>
-            {movieDetail?.playList?.length ? '选择播放列表' : '暂无播放源'}
-          </Text>
+          {
+            refreshing ? (
+              <View style={tw`flex-row items-center gap-[8px]`}>
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={tw`text-[${MD2Colors.white}]`}>加载中...</Text>
+              </View>
+            ) : (
+              <Text style={styles.playButtonText}>
+                {movieDetail?.playList?.length ? '选择播放列表' : '暂无播放源'}
+              </Text>
+            )
+          }
         </TouchableOpacity>
       </View>
       <BottomSheet
