@@ -112,7 +112,7 @@ export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = asyn
     }
 
     // 构建搜索 URL
-    const url = `${HOST}daoyongjiekoshibushiy0ubing?q=${encodeURIComponent(keyword)}`;
+    const url = `${HOST}daoyongjiekoshibushiy0ubing?q=${encodeURIComponent(keyword)}&f=_all&p=${page}`;
     // 使用 puppeteer 获取搜索结果
     const data = await jssdk.puppeteer({
       url,
@@ -204,13 +204,14 @@ export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = asyn
                   }
 
                   var href = link.getAttribute('href');
-                  if (!href) {
-                    console.warn('分页链接缺少href属性');
-                    return;
-                  }
 
                   if (link.classList.contains('current')) {
                     pagination.currentPage = pageNum;
+                    pagination.pages.push({
+                      number: pageNum,
+                      url: window.location.href,
+                      isCurrent: true
+                    });
                   } else {
                     pagination.pages.push({
                       number: pageNum,
@@ -585,7 +586,7 @@ export const getVideoCategory: TVideoProvider['getVideoCategory'] = async (url?:
                           if (!isNaN(pageNum)) {
                               const pageInfo = {
                                   number: pageNum,
-                                  url: link.href || '',
+                                  url: link.href || window.location.href,
                                   isCurrent: link.classList.contains('current')
                               };
                               

@@ -5,7 +5,7 @@ import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndi
 import { useImmer } from 'use-immer';
 import lodash from 'lodash';
 import Item from '@/components/item';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import type { TVideo } from '@/services';
 import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/categories';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
@@ -46,6 +46,7 @@ const MovieListPage: React.FC = () => {
   // 引用和状态
   const flatListRef = useRef<FlatList<MovieItem>>(null);
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [selectedTab, setSelectedTab] = useState('全部');
@@ -83,6 +84,7 @@ const MovieListPage: React.FC = () => {
 
       try {
         const response = await ui.getVideoCategory(url);
+        console.error('response', response.pagination.currentPage, response.pagination.totalPages);
         if (response) {
           // 更新分类信息
           setCategories(response.categories);
@@ -162,14 +164,15 @@ const MovieListPage: React.FC = () => {
    * 处理上拉加载更多
    */
   const handleLoadMore = useCallback(async () => {
+    console.error('handleLoadMore', isLoadingMore, pagination.hasMore);
     if (isLoadingMore || !pagination.hasMore) return;
     try {
       setIsLoadingMore(true);
       // 获取当前选中的分类URL
-      const currentUrl = selectedYear?.url || selectedTag?.url || selectedSeries?.url;
-      if (currentUrl) {
+      const nextUrl = pagination.currentPage < pagination.totalPages ? `/page/${pagination.currentPage + 1}` : null;
+      if (nextUrl) {
         // 构建分页URL，假设分页参数为page
-        const pageUrl = `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}page=${pagination.currentPage + 1}`;
+        const pageUrl = `${nextUrl}`;
         await getData(pageUrl);
       }
     } catch (error) {
@@ -242,7 +245,7 @@ const MovieListPage: React.FC = () => {
   // 初始化加载数据
   useEffect(() => {
     getData();
-  }, []);
+  }, [isFocused]);
 
   /**
    * 渲染分类标签组

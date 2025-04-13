@@ -257,7 +257,7 @@ function Details() {
     const itemUrlObj = new URLParse(`${item.url}`);
     const hisUrlObj = new URLParse(`${historyInfo?.playUrl}`);
     const hisBtn = itemUrlObj.pathname === hisUrlObj.pathname;
-    const loading = hisBtn && playLoading;
+    const loading = playLoading;
 
     return (
       <TouchableOpacity

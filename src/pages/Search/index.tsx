@@ -2,9 +2,9 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl, Alert } from 'react-native';
 import tw from 'twrnc';
 import lodash from 'lodash';
+import jssdk from '@htyf-mp/js-sdk';
 import { useUI } from '@/hooks';
 import { useImmer } from 'use-immer';
-import jssdk, { RequestOptions } from '@htyf-mp/js-sdk';
 import Item from '@/components/item';
 import { useNavigation } from '@react-navigation/native';
 import { Appbar } from 'react-native-paper';
@@ -34,8 +34,6 @@ interface PaginationInfo {
   hasMore: boolean;
 }
 
-
-let isFirstSearch = true;
 
 /**
  * 电影搜索页面组件
@@ -76,32 +74,31 @@ const MovieSearchPage: React.FC = () => {
       }
 
       try {
-        if (jssdk) {
-          setLoading(true);
-          const data = await ui.getVideoSearchResult(searchword, page);
-          if (data?.list) {
-            // 将每个电影数据保存到 useAppStore 中
-            data.list.forEach(movie => {
-              updateVideoData(movie.href, movie);
-            });
+        setLoading(true);
+        const data = await ui.getVideoSearchResult(searchword, page);
+        // data.pagination.currentPage = page;
+        if (data?.list) {
+          // 将每个电影数据保存到 useAppStore 中
+          data.list.forEach(movie => {
+            updateVideoData(movie.href, movie);
+          });
 
-            // 更新本地状态
-            setDataObj(_dataObj => {
-              if (page === 1) {
-                return { 1: data.list };
-              }
-              _dataObj[page] = data.list;
-              return _dataObj;
-            });
+          // 更新本地状态
+          setDataObj(_dataObj => {
+            if (page === 1) {
+              return { 1: data.list };
+            }
+            _dataObj[page] = data.list;
+            return _dataObj;
+          });
 
-            // 更新分页信息
-            setPagination(prev => ({
-              ...prev,
-              currentPage: data.pagination.currentPage,
-              totalPages: data.pagination.totalPages,
-              hasMore: data.pagination.currentPage < data.pagination.totalPages,
-            }));
-          }
+          // 更新分页信息
+          setPagination(prev => ({
+            ...prev,
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            hasMore: data.pagination.currentPage < data.pagination.totalPages,
+          }));
         }
       } catch (error) {
         console.error('搜索失败:', error);
@@ -203,10 +200,8 @@ const MovieSearchPage: React.FC = () => {
         />
       </View>
 
-      {jssdk.AdBanner && <jssdk.AdBanner />}
-
       {/* 电影列表 */}
-      {loading ? <Skeleton loading={loading} /> : (
+      {(list.length === 0 && loading) ? <Skeleton loading={loading} /> : (
         <FlatList
           ref={flatListRef}
           data={list}
@@ -226,6 +221,13 @@ const MovieSearchPage: React.FC = () => {
           }
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
+          ListHeaderComponent={() => {
+            return (
+              <View style={tw`justify-start items-center`}>
+                {jssdk.AdBanner && <jssdk.AdBanner />}
+              </View>
+            )
+          }}
           ListFooterComponent={renderLoading}
         />
       )}
