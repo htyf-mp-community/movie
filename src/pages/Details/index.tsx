@@ -76,7 +76,7 @@ function Details() {
   const updateVideoData = useAppStore(state => state.updateVideoData);
   const getVideoData = useAppStore(state => state.getVideoData);
   const updateHistory = useAppStore(state => state.updateHistory);
-  const getHistory = useAppStore(state => state.getHistory);
+  const getHistoryData = useAppStore(state => state.getHistoryData);
 
   const movieDetail = useAppStore(state => state.videoData[url]);
 
@@ -111,8 +111,8 @@ function Details() {
    * 获取历史记录信息
    */
   const historyInfo = useMemo(() => {
-    return getHistory(url);
-  }, [url, getHistory]);
+    return getHistoryData();
+  }, [getHistoryData]);
 
   /**
    * 获取视频源数据
@@ -268,11 +268,11 @@ function Details() {
         ]}
         disabled={loading}
         onPress={() => {
-          updateHistory({
-            url: url,
-            playUrl: item.url,
-            time: Date.now(),
-          });
+          // updateHistory({
+          //   url: url,
+          //   playUrl: item.url,
+          //   time: Date.now(),
+          // });
           getPlayUrl(item.url, true);
         }}
       >

@@ -67,7 +67,6 @@ const Item: React.FC<ItemProps> = (props) => {
       if (info) {
         props?.onPress?.({
           ...info,
-          url: props.url,
         });
       }
     };

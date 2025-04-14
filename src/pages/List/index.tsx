@@ -13,14 +13,7 @@ import { useAppStore } from '@/store';
 
 // 电影列表项接口
 interface MovieItem {
-  url: string;
-  name: string;
-  img?: string;
-  year: string;
-  type: string;
-  rating?: string;
-  description: string;
-  [key: string]: any;
+  href: string;
 }
 
 // 数据对象接口
@@ -67,7 +60,7 @@ const MovieListPage: React.FC = () => {
 
   // 从 useAppStore 获取数据和方法
   const updateVideoData = useAppStore(state => state.updateVideoData);
-
+  const getVideoData = useAppStore(state => state.getVideoData);
   /**
    * 获取电影列表数据
    */
@@ -95,13 +88,7 @@ const MovieListPage: React.FC = () => {
               // 刷新时清空数据
               draft[selectedTab] = {
                 items: response.list.map(movie => ({
-                  url: movie.href,
-                  name: movie.title,
-                  img: movie.cover,
-                  year: movie.year,
-                  type: movie.type,
-                  rating: movie.rating,
-                  description: movie.description
+                  href: movie.href
                 }))
               };
             } else {
@@ -111,13 +98,7 @@ const MovieListPage: React.FC = () => {
                 items: [
                   ...currentItems,
                   ...response.list.map(movie => ({
-                    url: movie.href,
-                    name: movie.title,
-                    img: movie.cover,
-                    year: movie.year,
-                    type: movie.type,
-                    rating: movie.rating,
-                    description: movie.description
+                    href: movie.href
                   }))
                 ]
               };
@@ -390,18 +371,21 @@ const MovieListPage: React.FC = () => {
     </View>
   ), [isLoadingMore, pagination.currentPage]);
 
-  const renderMovieItem = useCallback(({ item }: { item: MovieItem }) => (
-    <Item
-      url={item.url}
-      title={item.name}
-      year={item.year}
-      cover={item.img}
-      rating={item.rating}
-      type={item.type}
-      description={item.description}
-      onPress={handleMoviePress}
-    />
-  ), [handleMoviePress]);
+  const renderMovieItem = useCallback(({ item }: { item: MovieItem }) => {
+    const movieData = getVideoData(item.href);
+    return (
+      <Item
+        url={item.href}
+        title={movieData?.title || ''}
+        year={movieData?.year || ''}
+        cover={movieData?.cover}
+        rating={movieData?.rating}
+        type={movieData?.type || ''}
+        description={movieData?.description || ''}
+        onPress={handleMoviePress}
+      />
+    );
+  }, [handleMoviePress]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -411,7 +395,7 @@ const MovieListPage: React.FC = () => {
           ref={flatListRef}
           data={list}
           renderItem={renderMovieItem}
-          keyExtractor={(item) => item.url}
+          keyExtractor={(item) => item.href}
           numColumns={2}
           contentContainerStyle={styles.movieList}
           refreshControl={

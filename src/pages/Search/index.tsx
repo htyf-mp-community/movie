@@ -15,10 +15,10 @@ import { useAppStore } from '@/store';
 /**
  * 数据对象接口
  * @interface DataObject
- * @property {TVideo[]} [key: string] - 按页码存储的视频数据
+ * @property {string[]} [key: string] - 按页码存储的视频 href 列表
  */
 interface DataObject {
-  [key: string]: TVideo[];
+  [key: string]: string[];
 }
 
 /**
@@ -43,7 +43,7 @@ interface PaginationInfo {
 const MovieSearchPage: React.FC = () => {
   // 引用和状态
   const ui = useUI();
-  const flatListRef = useRef<FlatList<TVideo>>(null);
+  const flatListRef = useRef<FlatList<string>>(null);
   const navigation = useNavigation();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -57,7 +57,7 @@ const MovieSearchPage: React.FC = () => {
   });
 
   // 从 useAppStore 获取数据和方法
-  const updateVideoData = useAppStore(state => state.updateVideoData);
+  const { updateVideoData, getVideoData } = useAppStore();
 
   /**
    * 获取搜索结果数据
@@ -76,19 +76,18 @@ const MovieSearchPage: React.FC = () => {
       try {
         setLoading(true);
         const data = await ui.getVideoSearchResult(searchword, page);
-        // data.pagination.currentPage = page;
         if (data?.list) {
           // 将每个电影数据保存到 useAppStore 中
           data.list.forEach(movie => {
             updateVideoData(movie.href, movie);
           });
 
-          // 更新本地状态
+          // 更新本地状态，只存储 href
           setDataObj(_dataObj => {
             if (page === 1) {
-              return { 1: data.list };
+              return { 1: data.list.map(movie => movie.href) };
             }
-            _dataObj[page] = data.list;
+            _dataObj[page] = data.list.map(movie => movie.href);
             return _dataObj;
           });
 
@@ -114,9 +113,9 @@ const MovieSearchPage: React.FC = () => {
    * 合并所有页面的搜索结果
    */
   const list = useMemo(() => {
-    const _list: TVideo[] = [];
+    const _list: string[] = [];
     for (const key in dataObj) {
-      const items = lodash.get(dataObj, `[${key}]`, []) as TVideo[];
+      const items = lodash.get(dataObj, `[${key}]`, []) as string[];
       _list.push(...items);
     }
     return _list;
@@ -168,18 +167,22 @@ const MovieSearchPage: React.FC = () => {
     </View>
   ), [isLoadingMore, pagination.currentPage]);
 
-  const renderMovieItem = useCallback(({ item }: { item: TVideo }) => (
-    <Item
-      url={item.href}
-      title={item.title}
-      year={item.year}
-      cover={item.cover}
-      rating={item.rating}
-      type={item.type}
-      description={item.description}
-      onPress={handleMoviePress}
-    />
-  ), [handleMoviePress]);
+  const renderMovieItem = useCallback(({ item }: { item: string }) => {
+    const video = getVideoData(item);
+    if (!video) return null;
+    return (
+      <Item
+        url={video.href}
+        title={video.title}
+        year={video.year}
+        cover={video.cover}
+        rating={video.rating}
+        type={video.type}
+        description={video.description}
+        onPress={handleMoviePress}
+      />
+    );
+  }, [handleMoviePress, getVideoData]);
 
   return (
     <View style={styles.container}>
@@ -206,7 +209,7 @@ const MovieSearchPage: React.FC = () => {
           ref={flatListRef}
           data={list}
           renderItem={renderMovieItem}
-          keyExtractor={(item) => item.href}
+          keyExtractor={(item) => item}
           numColumns={2}
           contentContainerStyle={styles.movieList}
           refreshControl={

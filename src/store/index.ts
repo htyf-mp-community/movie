@@ -16,7 +16,6 @@ export interface HistoryItem {
   time: number;
 }
 
-
 /**
  * 存储配置接口
  * @interface StorageConfig
@@ -36,15 +35,13 @@ interface StorageConfig {
  */
 interface AppState {
   videoData: Record<string, TVideo>;
-  history: {
-    url: string;
-    playUrl: string;
-    time: number;
-  }[];
+  historyData: string[];
+  homeData: string[];
   updateVideoData: (url: string, data: TVideo) => void;
   getVideoData: (url: string) => TVideo | undefined;
-  updateHistory: (data: { url: string; playUrl: string; time: number }) => void;
-  getHistory: (url: string) => { url: string; playUrl: string; time: number } | undefined;
+  updateHistory: (url: string, playUrl: string) => void;
+  getHistoryData: () => string[];
+  updateHomeData: (data: string[]) => void;
 }
 
 /**
@@ -62,11 +59,12 @@ const asyncStoragePersistConfig: StorageConfig = {
 
 /**
  * 初始状态
- * @constant {Omit<AppState, keyof Pick<AppState, 'updateVideoData' | 'getVideoData' | 'updateDBData' | 'getDBData' | 'updateHistory' | 'getHistory'>>}
+ * @constant {Omit<AppState, keyof Pick<AppState, 'updateVideoData' | 'getVideoData' | 'updateHistory' | 'getHistoryData' | 'updateHomeData'>>}
  */
-const initialState: Omit<AppState, keyof Pick<AppState, 'updateVideoData' | 'getVideoData' | 'updateHistory' | 'getHistory'>> = {
+const initialState: Omit<AppState, keyof Pick<AppState, 'updateVideoData' | 'getVideoData' | 'updateHistory' | 'getHistoryData' | 'updateHomeData'>> = {
   videoData: {},
-  history: [],
+  historyData: [],
+  homeData: [],
 };
 
 /**
@@ -81,7 +79,7 @@ export const useAppStore = create<AppState>()(
        * 更新视频数据
        */
       updateVideoData: (url: string, data: TVideo) => {
-        set((state) => {
+        set((state: AppState) => {
           const existingData = state.videoData[url] || {};
           const mergedData = {
             ...existingData,
@@ -114,26 +112,37 @@ export const useAppStore = create<AppState>()(
        * 获取视频数据
        */
       getVideoData: (url: string) => {
-        return get().videoData[url];
+        const state = get();
+        return state.videoData[url];
       },
 
       /**
        * 更新历史记录
        */
-      updateHistory: (data: { url: string; playUrl: string; time: number }) => {
-        set((state) => {
-          const history = state.history.filter((item) => item.url !== data.url);
+      updateHistory: (url: string, playUrl: string) => {
+        set((state: AppState) => {
+          // 移除已存在的相同 url
+          const history = state.historyData.filter(item => item !== url);
+          // 添加到开头
           return {
-            history: [...history, data],
+            historyData: [url, ...history],
           };
         });
       },
 
       /**
-       * 获取历史记录
+       * 获取历史记录数据
        */
-      getHistory: (url: string) => {
-        return get().history.find((item) => item.url === url);
+      getHistoryData: () => {
+        const state = get();
+        return state.historyData;
+      },
+
+      /**
+       * 更新首页数据
+       */
+      updateHomeData: (data: string[]) => {
+        set({ homeData: data });
       },
     }),
     {

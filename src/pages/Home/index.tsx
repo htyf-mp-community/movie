@@ -10,25 +10,12 @@ import {
 } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import lodash from 'lodash';
 import { useUI } from '@/hooks';
 import jssdk from '@htyf-mp/js-sdk';
 import Item from '@/components/item';
 import Skeleton from '@/components/Skeleton';
 import type { TVideo } from '@/services';
 import { useAppStore } from '@/store';
-
-/**
- * 首页状态接口
- * @interface HomeState
- * @property {string[]} [items] - 视频 URL 列表
- * @property {TVideo[]} [videos] - 视频数据列表
- */
-interface HomeState {
-  items?: string[];
-  videos?: TVideo[];
-  [key: string]: any;
-}
 
 /**
  * 历史记录项接口
@@ -57,12 +44,9 @@ function Home() {
   const navigation = useNavigation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [home, setHome] = useState<HomeState>({});
 
   // 从 useAppStore 获取数据
-  const updateVideoData = useAppStore(state => state.updateVideoData);
-  const getHistory = useAppStore(state => state.getHistory);
-  const history = useAppStore(state => state.history);
+  const { updateVideoData, historyData, homeData, updateHomeData, getVideoData } = useAppStore();
 
   /**
    * 获取首页数据
@@ -83,11 +67,8 @@ function Home() {
         updateVideoData(video.href, video);
       });
 
-      // 更新本地状态
-      setHome({
-        videos,
-        items: videos.map((video) => video.href),
-      });
+      // 更新 store 中的 homeData
+      updateHomeData(videos.map(video => video.href));
 
     } catch (error) {
       console.error('获取首页数据失败:', error);
@@ -96,7 +77,7 @@ function Home() {
       setIsRefreshing(false);
       setIsLoading(false);
     }
-  }, [updateVideoData]);
+  }, [updateVideoData, updateHomeData]);
 
   /**
    * 处理视频项点击
@@ -121,9 +102,9 @@ function Home() {
    * 按时间倒序排序
    */
   const hisList = useMemo(() => {
-    if (!history) return [];
-    return lodash.orderBy(Object.values(history), ['time'], ['desc']);
-  }, [history]);
+    if (!historyData?.length) return [];
+    return historyData;
+  }, [historyData]);
 
   /**
    * 渲染历史记录列表
@@ -137,16 +118,26 @@ function Home() {
         <Text style={styles.sectionTitle}>历史记录</Text>
         <FlatList
           data={hisList}
-          renderItem={({ item }) => (
-            <View style={styles.historyItem}>
-              <Item
-                key={item.url}
-                url={item.url}
-                onPress={handleVideoPress}
-              />
-            </View>
-          )}
-          keyExtractor={(item) => item.url}
+          renderItem={({ item }) => {
+            const video = getVideoData(item);
+            if (!video) return null;
+            return (
+              <View style={styles.historyItem}>
+                <Item
+                  key={item}
+                  url={item}
+                  title={video.title}
+                  year={video.year}
+                  cover={video.cover}
+                  rating={video.rating}
+                  type={video.type}
+                  description={video.description}
+                  onPress={handleVideoPress}
+                />
+              </View>
+            );
+          }}
+          keyExtractor={(item) => item}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
@@ -154,7 +145,7 @@ function Home() {
         <Text style={styles.sectionTitle}>热门影视</Text>
       </View>
     );
-  }, [hisList, handleVideoPress]);
+  }, [hisList, handleVideoPress, getVideoData]);
 
   /**
    * 渲染视频项
@@ -162,7 +153,7 @@ function Home() {
    * @returns {JSX.Element | null} 视频项组件
    */
   const renderVideoItem: ListRenderItem<string> = useCallback(({ item }) => {
-    const video = home?.videos?.find(v => v.href === item);
+    const video = getVideoData(item);
     if (!video) return null;
     return (
       <Item
@@ -176,7 +167,7 @@ function Home() {
         onPress={handleVideoPress}
       />
     );
-  }, [home?.videos, handleVideoPress]);
+  }, [handleVideoPress]);
 
   /**
    * 渲染加载状态
@@ -222,7 +213,7 @@ function Home() {
       ) : (
         <FlatList
           style={styles.list}
-          data={home?.items || []}
+          data={homeData || []}
           ListHeaderComponent={renderHistoryList}
           ListFooterComponent={renderListFooter}
           renderItem={renderVideoItem}

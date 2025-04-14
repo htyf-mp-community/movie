@@ -138,7 +138,7 @@ export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = asyn
                     return;
                   }
 
-                  var href = titleElement.getAttribute('href');
+                  var href = window.location.origin + titleElement.getAttribute('href');
                   var title = titleElement.textContent ? titleElement.textContent.trim() : '';
                   var cover = imageElement.getAttribute('src');
                   var actorsText = actorsElement.textContent ? actorsElement.textContent.replace('主演：', '').trim() : '';
@@ -153,17 +153,15 @@ export const getVideoSearchResult: TVideoProvider['getVideoSearchResult'] = asyn
                     title: title,
                     year: '',
                     cover: cover,
-                    details: {
-                      type: '',
-                      region: '',
-                      year: '',
-                      alias: [],
-                      releaseDate: '',
-                      director: [],
-                      writer: [],
-                      actors: actorsText ? actorsText.split(',').map(function(actor) { return actor.trim(); }) : [],
-                      language: ''
-                    },
+                    type: '',
+                    region: '',
+                    year: '',
+                    alias: [],
+                    releaseDate: '',
+                    director: [],
+                    writer: [],
+                    actors: actorsText ? actorsText.split(',').map(function(actor) { return actor.trim(); }) : [],
+                    language: '',
                     description: '',
                     playList: []
                   });
