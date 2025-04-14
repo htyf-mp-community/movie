@@ -208,7 +208,7 @@ function Home() {
         <Text style={styles.searchText}>点击搜索电影...</Text>
       </TouchableOpacity>
 
-      {(homeData && homeData.length > 0 && isLoading) ? (
+      {(homeData && homeData.length <= 0 && isLoading) ? (
         renderLoading()
       ) : (
         <FlatList
