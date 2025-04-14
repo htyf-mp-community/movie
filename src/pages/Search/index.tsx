@@ -232,6 +232,7 @@ const MovieSearchPage: React.FC = () => {
             )
           }}
           ListFooterComponent={isLoadingMore ? renderLoading : null}
+          ListFooterComponentStyle={{ paddingBottom: 50 }}
         />
       )}
     </View>

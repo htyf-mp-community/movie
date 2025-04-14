@@ -148,8 +148,8 @@ const styles = StyleSheet.create<Styles>({
     bottom: 0,
     left: 0,
     right: 0,
-    height: '50%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
   ratingContainer: {
     position: 'absolute',

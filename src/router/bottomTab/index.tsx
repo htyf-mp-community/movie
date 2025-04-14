@@ -1,8 +1,7 @@
-import { BottomTabBarButtonProps, BottomTabBarProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, useColorScheme, useWindowDimensions } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Icon, { Icons } from './components/Icons';
-import { useTheme } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur'
 
 import * as routerConf from '@/pages';
@@ -31,8 +30,6 @@ interface CustomTabButtonProps extends Omit<BottomTabBarButtonProps, 'children'>
 const TabButton = (props: CustomTabButtonProps) => {
   const { item, onPress, accessibilityState } = props;
   const focused = accessibilityState?.selected;
-  const isDarkMode = useColorScheme() === 'dark';
-  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
@@ -53,7 +50,6 @@ const TabButton = (props: CustomTabButtonProps) => {
           {item.label}
         </Text>
       </View>
-      {focused && <View style={styles.activeIndicator} />}
     </TouchableOpacity>
   )
 }
@@ -75,7 +71,7 @@ export default function NetflixTab() {
               style={StyleSheet.absoluteFillObject}
             />
           </View>
-        )
+        ),
       }}
 
     >
@@ -86,13 +82,9 @@ export default function NetflixTab() {
           component={item.component}
           options={{
             tabBarShowLabel: true,
-            tabBarStyle: {
-              ...styles.tabBar,
-              paddingBottom: insets.bottom,
-            },
             tabBarButton: (props) => (
               <TabButton {...props} item={item} />
-            )
+            ),
           }}
         />
       ))}
@@ -123,6 +115,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   tabBar: {
     backgroundColor: 'transparent',

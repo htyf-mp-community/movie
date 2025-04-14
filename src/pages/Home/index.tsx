@@ -220,6 +220,7 @@ function Home() {
           keyExtractor={(item, index) => `${index}_${item}`}
           numColumns={NUM_COLUMNS}
           contentContainerStyle={styles.listContent}
+          ListFooterComponentStyle={{ paddingBottom: 50 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}

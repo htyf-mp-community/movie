@@ -417,6 +417,7 @@ const MovieListPage: React.FC = () => {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.1}
             ListFooterComponent={isLoadingMore ? renderLoading : null}
+            ListFooterComponentStyle={{ paddingBottom: 50 }}
           />
         }
 
