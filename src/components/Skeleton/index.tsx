@@ -6,43 +6,25 @@ import { ActivityIndicator, Text } from 'react-native-paper';
 interface SkeletonProps {
   loading?: boolean;
   children?: React.ReactNode;
+  count?: number;
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({ loading = true, children }) => {
+const Skeleton: React.FC<SkeletonProps> = ({ loading = true, children, count = 6 }) => {
   if (!loading) {
     return <>{children}</>;
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.skeletonItem}>
-        <View style={styles.skeletonImage} />
-        <View style={styles.skeletonContent}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonInfo} />
+      {Array.from({ length: count }).map((_, index) => (
+        <View key={index} style={styles.skeletonItem}>
+          <View style={styles.skeletonImage} />
+          <View style={styles.skeletonContent}>
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonInfo} />
+          </View>
         </View>
-      </View>
-      <View style={styles.skeletonItem}>
-        <View style={styles.skeletonImage} />
-        <View style={styles.skeletonContent}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonInfo} />
-        </View>
-      </View>
-      <View style={styles.skeletonItem}>
-        <View style={styles.skeletonImage} />
-        <View style={styles.skeletonContent}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonInfo} />
-        </View>
-      </View>
-      <View style={styles.skeletonItem}>
-        <View style={styles.skeletonImage} />
-        <View style={styles.skeletonContent}>
-          <View style={styles.skeletonTitle} />
-          <View style={styles.skeletonInfo} />
-        </View>
-      </View>
+      ))}
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#E50914" />
         <Text style={tw`text-white mt-4`}>资源加载中，请耐心等待...</Text>

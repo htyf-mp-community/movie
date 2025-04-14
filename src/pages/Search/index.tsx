@@ -160,10 +160,10 @@ const MovieSearchPage: React.FC = () => {
    * 渲染加载状态
    */
   const renderLoading = useCallback(() => (
-    <View style={tw`h-[180px] justify-start items-center`}>
-      {isLoadingMore && pagination.currentPage > 1 && (
-        <ActivityIndicator size="large" color="#0000ff" />
-      )}
+    <View style={styles.loadingContainer}>
+      <View style={styles.skeletonGrid}>
+        <Skeleton loading={true} />
+      </View>
     </View>
   ), [isLoadingMore, pagination.currentPage]);
 
@@ -231,7 +231,7 @@ const MovieSearchPage: React.FC = () => {
               </View>
             )
           }}
-          ListFooterComponent={renderLoading}
+          ListFooterComponent={isLoadingMore ? renderLoading : null}
         />
       )}
     </View>
@@ -279,6 +279,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
     color: '#fff',
+  },
+  loadingContainer: {
+    padding: 10,
+  },
+  skeletonGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });
 

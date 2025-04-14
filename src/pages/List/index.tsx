@@ -10,6 +10,7 @@ import type { TVideo } from '@/services';
 import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/categories';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useAppStore } from '@/store';
+import Skeleton from '@/components/Skeleton';
 
 // 电影列表项接口
 interface MovieItem {
@@ -363,13 +364,15 @@ const MovieListPage: React.FC = () => {
   /**
    * 渲染加载状态
    */
-  const renderLoading = useCallback(() => (
-    <View style={tw`h-[180px] justify-start items-center`}>
-      {isLoadingMore && pagination.currentPage > 1 && (
-        <ActivityIndicator size="large" color="#0000ff" />
-      )}
-    </View>
-  ), [isLoadingMore, pagination.currentPage]);
+  const renderLoading = useCallback(() => {
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={styles.skeletonGrid}>
+          <Skeleton loading={true} />
+        </View>
+      </View>
+    );
+  }, [isLoadingMore, pagination.currentPage]);
 
   const renderMovieItem = useCallback(({ item }: { item: MovieItem }) => {
     const movieData = getVideoData(item.href);
@@ -391,27 +394,32 @@ const MovieListPage: React.FC = () => {
     <SafeAreaView style={styles.container}>
       {renderListHeader()}
       <View style={tw`flex-grow`}>
-        <FlatList
-          ref={flatListRef}
-          data={list}
-          renderItem={renderMovieItem}
-          keyExtractor={(item) => item.href}
-          numColumns={2}
-          contentContainerStyle={styles.movieList}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              colors={['#E50914']}
-              tintColor="#E50914"
-              title="正在刷新..."
-              titleColor="#E50914"
-            />
-          }
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.1}
-          ListFooterComponent={renderLoading}
-        />
+        {
+          (list && list.length <= 0) ? (
+            renderLoading()
+          ) : <FlatList
+            ref={flatListRef}
+            data={list}
+            renderItem={renderMovieItem}
+            keyExtractor={(item) => item.href}
+            numColumns={2}
+            contentContainerStyle={styles.movieList}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={handleRefresh}
+                colors={['#E50914']}
+                tintColor="#E50914"
+                title="正在刷新..."
+                titleColor="#E50914"
+              />
+            }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={isLoadingMore ? renderLoading : null}
+          />
+        }
+
       </View>
 
       <BottomSheet
@@ -569,6 +577,30 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontSize: 14,
+  },
+  loadingContainer: {
+    padding: 10,
+  },
+  skeletonGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  skeletonItem: {
+    width: '50%',
+    padding: 5,
+  },
+  skeletonImage: {
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  skeletonContent: {
+    padding: 5,
+  },
+  skeletonTitle: {
+    marginBottom: 8,
+  },
+  skeletonInfo: {
+    marginTop: 4,
   },
 });
 

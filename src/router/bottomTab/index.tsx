@@ -1,9 +1,7 @@
 import { BottomTabBarButtonProps, BottomTabBarProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
-import React, { useEffect, useMemo, useRef } from 'react'
-import { Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, useColorScheme, useWindowDimensions } from 'react-native'
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, useColorScheme, useWindowDimensions } from 'react-native'
 import Icon, { Icons } from './components/Icons';
-import Colors from './Colors';
-import * as Animatable from 'react-native-animatable';
 import { useTheme } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur'
 
@@ -21,6 +19,7 @@ interface TabItem {
 const TabArr: TabItem[] = [
   { route: 'Tab_Home', label: '首页', type: 'Ionicons', icon: 'home', component: routerConf.Home },
   { route: 'Tab_Course', label: '分类', type: 'Ionicons', icon: 'grid', component: routerConf.List },
+  { route: 'Tab_Search', label: '搜索', type: 'Ionicons', icon: 'search', component: routerConf.Search },
 ];
 
 const Tab = createBottomTabNavigator();
@@ -61,8 +60,6 @@ const TabButton = (props: CustomTabButtonProps) => {
 
 export default function NetflixTab() {
   const insets = useSafeAreaInsets()
-  const size = useWindowDimensions()
-  const tabHeight = 60;
 
   return (
     <Tab.Navigator
@@ -80,34 +77,7 @@ export default function NetflixTab() {
           </View>
         )
       }}
-      tabBar={(props) => (
-        <View
-          style={[
-            styles.tabBarContainer,
-            {
-              height: tabHeight,
-              bottom: Math.max(insets.bottom, 0),
-            }
-          ]}
-        >
-          <View style={styles.tabBarContent}>
-            {props.state.routes.map((route, index) => {
-              const { options } = props.descriptors[route.key];
-              const isFocused = props.state.index === index;
-              const item = TabArr[index];
 
-              return (
-                <TabButton
-                  key={route.key}
-                  item={item}
-                  onPress={() => props.navigation.navigate(route.name)}
-                  accessibilityState={{ selected: isFocused }}
-                />
-              );
-            })}
-          </View>
-        </View>
-      )}
     >
       {TabArr.map((item, index) => (
         <Tab.Screen
@@ -116,6 +86,13 @@ export default function NetflixTab() {
           component={item.component}
           options={{
             tabBarShowLabel: true,
+            tabBarStyle: {
+              ...styles.tabBar,
+              paddingBottom: insets.bottom,
+            },
+            tabBarButton: (props) => (
+              <TabButton {...props} item={item} />
+            )
           }}
         />
       ))}
@@ -151,7 +128,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderTopWidth: 0,
     elevation: 0,
-    height: 60,
     position: 'absolute',
     bottom: 0,
     left: 0,
