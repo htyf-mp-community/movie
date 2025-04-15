@@ -111,7 +111,7 @@ function Details() {
    * 获取历史记录信息
    */
   const historyInfo = useMemo(() => {
-    return getHistoryData();
+    return getHistoryData().find(item => item.url === url);
   }, [getHistoryData]);
 
   /**
@@ -254,30 +254,22 @@ function Details() {
    * 渲染播放列表项
    */
   const renderPlayItem = useCallback<ListRenderItem<TVideo['playList'][0]>>(({ item }) => {
-    const itemUrlObj = new URLParse(`${item.url}`);
-    const hisUrlObj = new URLParse(`${historyInfo?.playUrl}`);
-    const hisBtn = itemUrlObj.pathname === hisUrlObj.pathname;
     const loading = playLoading;
-
+    const isHistory = historyInfo?.playUrl === item.url;
     return (
       <TouchableOpacity
         style={[
           styles.playItem,
           tw`gap-[8px]`,
-          hisBtn ? tw`bg-red-300` : undefined,
+          isHistory ? tw`bg-red-300` : undefined,
         ]}
-        disabled={loading}
         onPress={() => {
-          // updateHistory({
-          //   url: url,
-          //   playUrl: item.url,
-          //   time: Date.now(),
-          // });
+          updateHistory(url, item.url);
           getPlayUrl(item.url, true);
         }}
       >
         <Text style={styles.playText}>{item.title}</Text>
-        {loading && (
+        {(loading && historyInfo?.playUrl === item.url) && (
           <View style={tw`justify-center items-center gap-[8px] flex-row`}>
             <ActivityIndicator animating={true} color={MD2Colors.red800} />
             <Text style={tw`text-[${MD2Colors.red800}]`}>加载视频中...</Text>
@@ -405,10 +397,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
+    flexGrow: 2,
     height: 0,
   },
   scrollView: {
-    flexGrow: 1,
+    flexGrow: 2,
   },
   detailContainer: {
     padding: 16,

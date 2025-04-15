@@ -11,6 +11,7 @@ import { Appbar } from 'react-native-paper';
 import type { TVideo } from '@/services';
 import Skeleton from '@/components/Skeleton';
 import { useAppStore } from '@/store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * 数据对象接口
@@ -41,6 +42,7 @@ interface PaginationInfo {
  * @component MovieSearchPage
  */
 const MovieSearchPage: React.FC = () => {
+  const insets = useSafeAreaInsets();
   // 引用和状态
   const ui = useUI();
   const flatListRef = useRef<FlatList<string>>(null);
@@ -184,6 +186,14 @@ const MovieSearchPage: React.FC = () => {
     );
   }, [handleMoviePress, getVideoData]);
 
+  const renderListFooter = useCallback(() => {
+    return (
+      <View style={styles.listFooter}>
+        {isLoadingMore ? renderLoading() : null}
+      </View>
+    );
+  }, [isLoadingMore, renderLoading]);
+
   return (
     <View style={styles.container}>
       <Appbar.Header mode="small" style={[tw`h-[50px]`, { backgroundColor: 'transparent' }]}>
@@ -231,8 +241,8 @@ const MovieSearchPage: React.FC = () => {
               </View>
             )
           }}
-          ListFooterComponent={isLoadingMore ? renderLoading : null}
-          ListFooterComponentStyle={{ paddingBottom: 50 }}
+          ListFooterComponent={renderListFooter}
+          ListFooterComponentStyle={{ paddingBottom: 60 + insets.bottom }}
         />
       )}
     </View>
@@ -287,6 +297,8 @@ const styles = StyleSheet.create({
   skeletonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  listFooter: {
   },
 });
 

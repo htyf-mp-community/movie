@@ -939,15 +939,14 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
     if (!iframeData?.url) {
       throw new Error('无法获取 iframe 中的视频播放地址');
     }
-
-    return {
-      url: iframeData.url,
-      headers: {
-        ...headers,
-        'Host': URLParse(iframeData.url, true).host || '',
-      },
+    
+    const res = {
+      url: `${iframeData.url}`,
+      headers: Object.assign({}, headers, {
+        'Host': URLParse(iframeData.url, true).host || ''
+      }),
     };
-
+    return res as any;
   } catch (error) {
     console.error('获取视频播放地址失败:', error);
     throw error;

@@ -11,6 +11,7 @@ import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/ca
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useAppStore } from '@/store';
 import Skeleton from '@/components/Skeleton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // 电影列表项接口
 interface MovieItem {
@@ -37,6 +38,7 @@ interface PaginationInfo {
  * 显示不同分类的电影列表，支持下拉刷新和上拉加载更多
  */
 const MovieListPage: React.FC = () => {
+  const insets = useSafeAreaInsets();
   // 引用和状态
   const flatListRef = useRef<FlatList<MovieItem>>(null);
   const navigation = useNavigation();
@@ -374,6 +376,14 @@ const MovieListPage: React.FC = () => {
     );
   }, [isLoadingMore, pagination.currentPage]);
 
+  const renderListFooter = useCallback(() => {
+    return (
+      <View style={styles.listFooter}>
+        {isLoadingMore ? renderLoading() : null}
+      </View>
+    );
+  }, [isLoadingMore, pagination.currentPage]);
+
   const renderMovieItem = useCallback(({ item }: { item: MovieItem }) => {
     const movieData = getVideoData(item.href);
     return (
@@ -416,8 +426,8 @@ const MovieListPage: React.FC = () => {
             }
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.1}
-            ListFooterComponent={isLoadingMore ? renderLoading : null}
-            ListFooterComponentStyle={{ paddingBottom: 50 }}
+            ListFooterComponent={renderListFooter}
+            ListFooterComponentStyle={{ paddingBottom: 60 + insets.bottom }}
           />
         }
 
@@ -603,6 +613,7 @@ const styles = StyleSheet.create({
   skeletonInfo: {
     marginTop: 4,
   },
+  listFooter: {},
 });
 
 export default MovieListPage;

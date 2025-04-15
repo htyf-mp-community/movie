@@ -35,12 +35,12 @@ interface StorageConfig {
  */
 interface AppState {
   videoData: Record<string, TVideo>;
-  historyData: string[];
+  historyData: HistoryItem[];
   homeData: string[];
   updateVideoData: (url: string, data: TVideo) => void;
   getVideoData: (url: string) => TVideo | undefined;
   updateHistory: (url: string, playUrl: string) => void;
-  getHistoryData: () => string[];
+  getHistoryData: () => HistoryItem[];
   updateHomeData: (data: string[]) => void;
 }
 
@@ -122,10 +122,10 @@ export const useAppStore = create<AppState>()(
       updateHistory: (url: string, playUrl: string) => {
         set((state: AppState) => {
           // 移除已存在的相同 url
-          const history = state.historyData.filter(item => item !== url);
+          const history = state.historyData.filter(item => item.url !== url);
           // 添加到开头
           return {
-            historyData: [url, ...history],
+            historyData: [{ url, playUrl, time: Date.now() }, ...history],
           };
         });
       },

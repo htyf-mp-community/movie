@@ -16,6 +16,7 @@ import Item from '@/components/item';
 import Skeleton from '@/components/Skeleton';
 import type { TVideo } from '@/services';
 import { useAppStore } from '@/store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * 历史记录项接口
@@ -44,6 +45,7 @@ function Home() {
   const navigation = useNavigation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const insets = useSafeAreaInsets();
 
   // 从 useAppStore 获取数据
   const { updateVideoData, historyData, homeData, updateHomeData, getVideoData } = useAppStore();
@@ -103,7 +105,7 @@ function Home() {
    */
   const hisList = useMemo(() => {
     if (!historyData?.length) return [];
-    return historyData;
+    return historyData.sort((a, b) => b.time - a.time);
   }, [historyData]);
 
   /**
@@ -119,13 +121,13 @@ function Home() {
         <FlatList
           data={hisList}
           renderItem={({ item }) => {
-            const video = getVideoData(item);
+            const video = getVideoData(item.url);
             if (!video) return null;
             return (
               <View style={styles.historyItem}>
                 <Item
-                  key={item}
-                  url={item}
+                  key={video.href}
+                  url={video.href}
                   title={video.title}
                   year={video.year}
                   cover={video.cover}
@@ -137,7 +139,7 @@ function Home() {
               </View>
             );
           }}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.url}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
@@ -220,7 +222,7 @@ function Home() {
           keyExtractor={(item, index) => `${index}_${item}`}
           numColumns={NUM_COLUMNS}
           contentContainerStyle={styles.listContent}
-          ListFooterComponentStyle={{ paddingBottom: 50 }}
+          ListFooterComponentStyle={{ paddingBottom: 60 + insets.bottom }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -288,6 +290,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   listFooter: {
-    height: 180,
   },
 });
