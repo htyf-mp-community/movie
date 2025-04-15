@@ -79,6 +79,7 @@ function Details() {
   const getHistoryData = useAppStore(state => state.getHistoryData);
 
   const movieDetail = useAppStore(state => state.videoData[url]);
+  const historyData = useAppStore(state => state.historyData);
 
   // BottomSheet 配置
   const snapPoints = useMemo(() => ['25%', '50%'], []);
@@ -111,8 +112,8 @@ function Details() {
    * 获取历史记录信息
    */
   const historyInfo = useMemo(() => {
-    return getHistoryData().find(item => item.url === url);
-  }, [getHistoryData]);
+    return historyData.find(item => item.url === url);
+  }, [historyData]);
 
   /**
    * 获取视频源数据
@@ -269,12 +270,12 @@ function Details() {
         }}
       >
         <Text style={styles.playText}>{item.title}</Text>
-        {(loading && historyInfo?.playUrl === item.url) && (
+        {(loading && historyInfo?.playUrl === item.url) ? (
           <View style={tw`justify-center items-center gap-[8px] flex-row`}>
             <ActivityIndicator animating={true} color={MD2Colors.red800} />
             <Text style={tw`text-[${MD2Colors.red800}]`}>加载视频中...</Text>
           </View>
-        )}
+        ) : undefined}
       </TouchableOpacity>
     );
   }, [historyInfo, playLoading, url, updateHistory, getPlayUrl]);

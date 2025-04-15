@@ -86,6 +86,7 @@ function Home() {
    * @param {TVideo} info - 视频信息
    */
   const handleVideoPress = useCallback((info: TVideo) => {
+    console.error(info);
     navigation.navigate('Details', {
       name: info.title,
       url: encodeURIComponent(info.href),
