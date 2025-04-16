@@ -27,8 +27,8 @@ export default function Root() {
         {
           (isReady && skdRef.current) ? <App /> : null
         }
-        <SDKPortal 
-          appid={pkg.appid} 
+        <SDKPortal
+          appid={pkg.appid}
           launchOptions={{
             extraData: {}
           }}

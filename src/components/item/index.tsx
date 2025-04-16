@@ -104,9 +104,6 @@ const Item: React.FC<ItemProps> = (props) => {
           {props.year && (
             <Text style={styles.year}>{props.year}</Text>
           )}
-          {props.type && (
-            <Text style={styles.typeText}>{props.type}</Text>
-          )}
         </View>
         {props.description && (
           <Text
@@ -117,6 +114,7 @@ const Item: React.FC<ItemProps> = (props) => {
             {props.description}
           </Text>
         )}
+        <Text>{props.url}</Text>
       </View>
     </TouchableOpacity>
   );
