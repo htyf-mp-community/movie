@@ -833,7 +833,13 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
 
           // 检查 video 标签
           const videoNode = document.querySelector('video');
-          const videoUrl = videoNode?.getAttribute('src') || videoNode?.querySelector('source')?.src;
+          let videoUrl = videoNode?.getAttribute('src') || videoNode?.querySelector('source')?.src;
+          try {
+            if (mysvg) {
+              videoUrl = mysvg;
+            }
+          } catch (error) {
+          }
           if (videoUrl) {
             return {
               isIframe: false,
