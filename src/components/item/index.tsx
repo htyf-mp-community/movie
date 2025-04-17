@@ -114,7 +114,6 @@ const Item: React.FC<ItemProps> = (props) => {
             {props.description}
           </Text>
         )}
-        <Text>{props.url}</Text>
       </View>
     </TouchableOpacity>
   );

@@ -79,7 +79,7 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
   };
 
   // 第一次快速检查
-  const firstAttempt = await tryAuth(__DEV__ ? true : false);
+  const firstAttempt = await tryAuth(false);
   
   // 如果第一次失败，等待后重试
   if (!firstAttempt) {
@@ -910,13 +910,17 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
 
     // 处理直接播放的情况
     if (!data.isIframe) {
-      return {
+      const res = {
         url: data.url,
         headers: {
           ...headers,
           host: URLParse(HOST, true).host || '',
         },
       };
+      if (res.url.endsWith('.png')) {
+        res.headers = {} as any;
+      }
+      return res;
     }
 
     // 处理 iframe 播放的情况
@@ -946,6 +950,9 @@ export const getVideoUrl: TVideoProvider['getVideoUrl'] = async (path: string): 
         'Host': URLParse(iframeData.url, true).host || ''
       }),
     };
+    if (res.url.endsWith('.png')) {
+      res.headers = {} as any;
+    }
     return res as any;
   } catch (error) {
     console.error('获取视频播放地址失败:', error);
