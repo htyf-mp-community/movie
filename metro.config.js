@@ -1,16 +1,11 @@
-const isExpo = !!process.env.EXPO_DEV_SERVER_ORIGIN;
-console.log('isExpo', isExpo);
-if (isExpo) {
-  const { getDefaultConfig } = require('expo/metro-config');
-  module.exports = getDefaultConfig(__dirname);
-} else {
-  const { mergeConfig } = require('metro-config')
-  const { getMetroConfig } = require('@tarojs/rn-supporter')
-  module.exports = (async function () {
-    return mergeConfig({
-      // custom your metro config here
-      // https://facebook.github.io/metro/docs/configuration
-      resolver: {}
-    }, await getMetroConfig())
-  })()
-}
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+
+/**
+ * Metro configuration
+ * https://reactnative.dev/docs/metro
+ *
+ * @type {import('@react-native/metro-config').MetroConfig}
+ */
+const config = {};
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);

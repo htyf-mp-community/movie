@@ -3,7 +3,7 @@ import jssdk from '@htyf-mp/js-sdk';
 import type { TVideoProvider, TVideo, TVideoURL, SearchResult, CategoryResponse } from '../types';
 
 // 常量定义
-const HOST = "https://www.czzy77.com/";
+const HOST = "https://www.czzymovie.com/";
 const DEFAULT_TIMEOUT = 1000 * 30; // 30秒
 const DEFAULT_WAIT = 2000; // 2秒
 

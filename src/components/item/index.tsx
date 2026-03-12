@@ -3,7 +3,6 @@ import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, ViewStyle,
 import URLParse from "url-parse";
 import { useAppStore } from "@/store";
 import type { TVideo } from '@/services';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // 常量定义
 const NUM_COLUMNS = 2;
@@ -87,7 +86,6 @@ const Item: React.FC<ItemProps> = (props) => {
         <View style={styles.overlay} />
         {props.rating && (
           <View style={styles.ratingContainer}>
-            <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
             <Text style={styles.ratingText}>{props.rating}</Text>
           </View>
         )}
