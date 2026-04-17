@@ -9,7 +9,7 @@ const RootStack = createStackNavigator();
 
 const router = createRouter();
 
-function RootFix(props: any) {
+function RootFix() {
   return <RootStack.Navigator
     initialRouteName={'MainScreen'}
     screenOptions={{

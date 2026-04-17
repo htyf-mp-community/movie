@@ -4,7 +4,7 @@
   "htyf": {
     "type": "app",
     "entry": "./src/index.tsx",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "movie",
     "appid": "htyfappfb52f50e642c668cef1c9cf632d79eb1",
     "rotate": "portrait",

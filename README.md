@@ -25,15 +25,11 @@ npm run ios
 npm run android
 # H5
 npm run dev:h5
-# 微信小程序
-npm run dev:weapp
 # 红糖云小程序(选真机调试)
-npm run dgz
+npm run htyf
 ```
 
 ### 2. 打包
-
-> 打包其它小程序按 taro 官方文档打包
 
 > 如打包红糖云服小程序
 

@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { TVService, TVideoProvider } from '@/services';
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = __DEV__;
 
 export const UIContext = React.createContext<any>(null);
 

@@ -1,13 +1,13 @@
 import { useUI } from '@/hooks';
 import tw from 'twrnc';
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView, Alert, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView, SafeAreaView } from 'react-native';
 import { useImmer } from 'use-immer';
 import lodash from 'lodash';
 import Item from '@/components/item';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import type { TVideo } from '@/services';
-import type { Categories, CategoryItem, MovieInfo, Pagination } from '@/types/categories';
+import type { Categories, CategoryItem } from '@/types/categories';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useAppStore } from '@/store';
 import Skeleton from '@/components/Skeleton';

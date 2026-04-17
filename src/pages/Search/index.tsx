@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, TextInput, RefreshControl, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TextInput, RefreshControl } from 'react-native';
 import tw from 'twrnc';
 import lodash from 'lodash';
 import jssdk from '@htyf-mp/js-sdk';

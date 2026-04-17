@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
-import tw from 'twrnc';
 
 /**
  * 搜索栏组件属性接口

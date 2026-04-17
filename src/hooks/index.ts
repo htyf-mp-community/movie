@@ -1,7 +1,7 @@
 export * from './hooks';
 export * from './utils';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppStore } from '@/store';
 import { handleError, isValidUrl } from '@/utils';

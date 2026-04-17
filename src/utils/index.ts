@@ -10,7 +10,7 @@ let storage = asyncStorage;
 
 if (Platform.OS !== 'web') {
   try {
-    const MMKV_KEY = `app_${__APP_DEFINE_APPID__}_storage`;
+    const MMKV_KEY = `app_htyf_apps_movie_storage`;
     const Mmkv = require('react-native-mmkv').MMKV;
     const ReactNativeBlobUtil = require('react-native-blob-util').default
     const mmkvStorage = new Mmkv({

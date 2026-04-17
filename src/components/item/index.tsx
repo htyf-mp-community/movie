@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, ViewStyle, TextStyle, ImageStyle } from "react-native";
-import URLParse from "url-parse";
 import { useAppStore } from "@/store";
 import type { TVideo } from '@/services';
 

@@ -18,7 +18,6 @@ import { useUI } from '@/hooks';
 import jssdk from '@htyf-mp/js-sdk';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Appbar, MD2Colors } from 'react-native-paper';
-import URLParse from 'url-parse';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TVideo } from '@/services';
