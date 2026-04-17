@@ -34,7 +34,7 @@ npm run htyf
 > 如打包红糖云服小程序
 
 ```
-npm run build:dgz
+npm run htyf
 ```
 
 ### 3. 上传运行红糖云服小程序
