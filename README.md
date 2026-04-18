@@ -72,10 +72,10 @@ npm run htyf
 
 ## Star History
 
-<a href="https://www.star-history.com/#htyf-mp-community/simple_live&Date">
+<a href="https://www.star-history.com/#htyf-mp-community/movie&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/movie&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/movie&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=htyf-mp-community/movie&type=Date" />
   </picture>
 </a>
