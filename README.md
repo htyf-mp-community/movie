@@ -1,4 +1,14 @@
-## [红糖云服app下载 https://mp.dagouzhi.com/ ](https://mp.dagouzhi.com/)
+> ### ⚠ 说明
+>
+> 本仓库为 **红糖云服 App** 内的 **React Native 应用小程序**（电影）。需在宿主 App 中加载资源包，或按下方流程本地编译调试；分发与更新方式以 `app.json` 与官方文档为准。
+
+<h2 align="center">电影</h2>
+
+<p align="center">
+  <a href="https://mp.dagouzhi.com/">红糖云服 · 小程序官网</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/htyf-mp-community">GitHub 组织</a>
+</p>
 
 ### 使用红糖云服app 扫码添加小程序
 
@@ -54,10 +64,18 @@ npm run htyf
 
 并将以上 json 生成二维码就可以用红糖云服 app 扫码加入小程序
 
-## 投食
+## 声明
 
-开发迭代不易，觉得 App 好用的，有能力的请投喂一下，也可以给个星星
+本项目功能基于互联网上公开资料与学习交流目的开发。**严禁将本项目用于商业用途**；若用于红糖云服小程序分发，请同时遵守宿主平台与红糖云服的相关规则。
 
-| 微信  | 支付宝 |
-| ------------- | ------------- |
-| ![微信](./docs/IMG_5087.jpg)  | ![支付宝](./docs/IMG_5088.jpg) |
+若您认为本仓库内容侵犯合法权益，请联系作者以便及时处理。
+
+## Star History
+
+<a href="https://www.star-history.com/#htyf-mp-community/simple_live&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=htyf-mp-community/simple_live&type=Date" />
+  </picture>
+</a>

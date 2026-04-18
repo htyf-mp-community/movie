@@ -3,7 +3,7 @@ import jssdk from '@htyf-mp/js-sdk';
 import type { TVideoProvider, TVideo, TVideoURL, SearchResult, CategoryResponse } from '../types';
 
 // 常量定义
-const HOST = "https://www.czzymovie.com/";
+const HOST = "https://www.czzy89.com/";
 const DEFAULT_TIMEOUT = 1000 * 30; // 30秒
 const DEFAULT_WAIT = 2000; // 2秒
 
@@ -30,6 +30,7 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
     try {
       const url = HOST;
       const data: boolean = await jssdk.puppeteer({
+        debug: true,
         url,
         jscode: `function(callback) {
           try {
@@ -66,7 +67,6 @@ export const checkWebViewAuth = async (): Promise<boolean> => {
             callback(undefined, false)
           }
         }`,
-        debug,
         wait: 100,
         timeout: 1000 * 60 * 3,
         callback: () => {},
